@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_janari_alert_tree" model="ir.ui.view">
+        <field name="name">janari.bahan.baku.alert.tree</field>
+        <field name="model">janari.bahan.baku</field>
+        <field name="arch" type="xml">
+            <tree string="Peringatan Stok" decoration-danger="is_low_stock == True" create="false" edit="false">
+                <field name="name"/>
+                <field name="vendor"/>
+                <field name="stok_saat_ini"/>
+                <field name="reorder_point"/>
+                <field name="is_low_stock" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_janari_alert_stok" model="ir.actions.act_window">
+        <field name="name">Peringatan Stok Rendah</field>
+        <field name="res_model">janari.bahan.baku</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_low_stock', '=', True)]</field>
+        <field name="view_id" ref="view_janari_alert_tree"/>
+    </record>
+
+    <menuitem id="menu_janari_alert" name="Peringatan Stok" parent="menu_janari_inventory" action="action_janari_alert_stok" sequence="40"/>
+</odoo>

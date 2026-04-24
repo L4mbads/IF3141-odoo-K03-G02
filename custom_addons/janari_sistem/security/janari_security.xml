@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="module_category_janari" model="ir.module.category">
+            <field name="name">Sistem Janari</field>
+            <field name="description">Hak akses untuk Sistem Informasi Janari</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_janari_kasir" model="res.groups">
+            <field name="name">Staf Kasir</field>
+            <field name="category_id" ref="module_category_janari"/>
+        </record>
+
+        <record id="group_janari_packer" model="res.groups">
+            <field name="name">Staf Packer</field>
+            <field name="category_id" ref="module_category_janari"/>
+        </record>
+
+        <record id="group_janari_dapur" model="res.groups">
+            <field name="name">Staf Dapur</field>
+            <field name="category_id" ref="module_category_janari"/>
+        </record>
+
+        <record id="group_janari_kepala_staf" model="res.groups">
+            <field name="name">Kepala Staf</field>
+            <field name="category_id" ref="module_category_janari"/>
+        </record>
+
+        <record id="group_janari_pemilik" model="res.groups">
+            <field name="name">Pemilik</field>
+            <field name="category_id" ref="module_category_janari"/>
+            <field name="implied_ids" eval="[(4, ref('group_janari_kepala_staf')), (4, ref('group_janari_kasir')), (4, ref('group_janari_packer'))]"/>
+        </record>
+    </data>
+</odoo>

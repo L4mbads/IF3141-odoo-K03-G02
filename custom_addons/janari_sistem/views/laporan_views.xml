@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_janari_pesanan_pivot" model="ir.ui.view">
+        <field name="name">janari.pesanan.pivot</field>
+        <field name="model">janari.pesanan</field>
+        <field name="arch" type="xml">
+            <pivot string="Laporan Harian" sample="1">
+                <field name="tanggal_pesanan" type="row" interval="day"/>
+                <field name="status_pesanan" type="col"/>
+                <field name="total_harga" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_janari_pesanan_graph" model="ir.ui.view">
+        <field name="name">janari.pesanan.graph</field>
+        <field name="model">janari.pesanan</field>
+        <field name="arch" type="xml">
+            <graph string="Grafik Pendapatan Harian" type="bar">
+                <field name="tanggal_pesanan" type="row" interval="day"/>
+                <field name="total_harga" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_janari_laporan" model="ir.actions.act_window">
+        <field name="name">Laporan Penjualan Harian</field>
+        <field name="res_model">janari.pesanan</field>
+        <field name="view_mode">pivot,graph,tree</field>
+    </record>
+
+    <!-- <menuitem id="menu_janari_laporan_root" name="Laporan" parent="menu_janari_root" sequence="40" groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/> -->
+    <menuitem id="menu_janari_laporan_root"
+          name="Laporan"
+          parent="menu_janari_root"
+          sequence="40"
+          groups="group_janari_kepala_staf,group_janari_pemilik,base.group_system"/>
+    <menuitem id="menu_janari_laporan_harian" name="Rekapitulasi Harian" parent="menu_janari_laporan_root" action="action_janari_laporan" sequence="10"/>
+</odoo>

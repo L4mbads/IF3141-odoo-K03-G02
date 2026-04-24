@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_janari_inherit" model="ir.ui.view">
+        <field name="name">res.users.form.janari.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='access_rights']" position="inside">
+                <group string="Hak Akses Sistem Janari">
+                    <field name="janari_role"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_janari_user_management" model="ir.actions.act_window">
+        <field name="name">Manajemen Pengguna</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- <menuitem id="menu_janari_admin_root" name="Administrasi" parent="menu_janari_root" sequence="50" groups="janari_sistem.group_janari_pemilik"/> -->
+    <menuitem id="menu_janari_admin_root"
+          name="Administrasi"
+          parent="menu_janari_root"
+          sequence="50"
+          groups="group_janari_pemilik,base.group_system"/>
+    <menuitem id="menu_janari_user_management" name="Akun Pengguna" parent="menu_janari_admin_root" action="action_janari_user_management" sequence="10"/>
+</odoo>

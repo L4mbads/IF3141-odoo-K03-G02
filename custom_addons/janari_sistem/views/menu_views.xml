@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_janari_menu_tree" model="ir.ui.view">
+        <field name="name">janari.menu.tree</field>
+        <field name="model">janari.menu</field>
+        <field name="arch" type="xml">
+            <tree string="Daftar Menu">
+                <field name="name"/>
+                <field name="harga_menu"/>
+                <field name="status_menu"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_janari_menu_form" model="ir.ui.view">
+        <field name="name">janari.menu.form</field>
+        <field name="model">janari.menu</field>
+        <field name="arch" type="xml">
+            <form string="Menu">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nama Menu..."/></h1>
+                    </div>
+                    <group>
+                        <field name="harga_menu"/>
+                        <field name="status_menu"/>
+                    </group>
+                    <notebook>
+                        <page string="Resep (Bill of Materials)" name="resep">
+                            <field name="resep_ids">
+                                <tree editable="bottom">
+                                    <field name="bahan_baku_id"/>
+                                    <field name="jumlah_bahan"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_janari_menu" model="ir.actions.act_window">
+        <field name="name">Master Menu</field>
+        <field name="res_model">janari.menu</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_janari_master_menu" name="Daftar Menu" parent="menu_janari_inventory" action="action_janari_menu" sequence="20"/>
+</odoo>

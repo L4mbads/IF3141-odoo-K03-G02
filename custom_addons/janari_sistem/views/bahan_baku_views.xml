@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_janari_bahan_baku_tree" model="ir.ui.view">
+        <field name="name">janari.bahan.baku.tree</field>
+        <field name="model">janari.bahan.baku</field>
+        <field name="arch" type="xml">
+            <tree string="Bahan Baku">
+                <field name="name"/>
+                <field name="jenis"/>
+                <field name="stok_saat_ini"/>
+                <field name="reorder_point"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_janari_bahan_baku_form" model="ir.ui.view">
+        <field name="name">janari.bahan.baku.form</field>
+        <field name="model">janari.bahan.baku</field>
+        <field name="arch" type="xml">
+            <form string="Bahan Baku">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="jenis"/>
+                            <field name="vendor"/>
+                        </group>
+                        <group>
+                            <field name="harga"/>
+                            <field name="satuan"/>
+                            <field name="stok_saat_ini"/>
+                            <field name="reorder_point"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_janari_bahan_baku" model="ir.actions.act_window">
+        <field name="name">Data Bahan Baku</field>
+        <field name="res_model">janari.bahan.baku</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_bahan_baku" name="Bahan Baku" parent="menu_janari_inventory" action="action_janari_bahan_baku" sequence="10"/>
+</odoo>

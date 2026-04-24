@@ -1,0 +1,25 @@
+{
+    'name': 'Sistem Informasi Janari',
+    'version': '1.0',
+    'summary': 'Manajemen Inventaris, KDS, dan POS untuk Kedai Janari',
+    'description': 'Modul custom untuk Milestone 4 IF3141 Sistem Informasi ITB.',
+    'author': 'Kelompok 02 - K03',
+    'category': 'Operations',
+    'depends': ['base', 'mail'], # mail buat fitur chatter/audit trail bawaan Odoo
+    'data': [
+        'security/janari_security.xml',
+        'security/ir.model.access.csv',
+        'views/menu_root.xml',
+        'views/bahan_baku_views.xml',
+        'views/menu_views.xml',
+        'views/pesanan_views.xml',
+        'views/kds_views.xml',
+        'views/alert_views.xml',
+        'views/laporan_views.xml',
+        'views/user_views.xml',
+        'data/janari_data.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+}

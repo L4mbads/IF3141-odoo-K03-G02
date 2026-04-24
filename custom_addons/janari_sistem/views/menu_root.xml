@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_janari_root" name="Sistem Janari" sequence="10"/>
+
+    <menuitem id="menu_janari_pos" name="Point of Sale" parent="menu_janari_root" sequence="10"/>
+    <menuitem id="menu_janari_kds" name="Kitchen Display" parent="menu_janari_root" sequence="20"/>
+    <menuitem id="menu_janari_inventory" name="Inventory &amp; BOM" parent="menu_janari_root" sequence="30"/>
+</odoo>

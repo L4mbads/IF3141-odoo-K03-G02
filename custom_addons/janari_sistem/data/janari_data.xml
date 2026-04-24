@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="bahan_baku_kopi_arabica" model="janari.bahan.baku">
+            <field name="name">Biji Kopi Arabica</field>
+            <field name="jenis">Bahan Utama</field>
+            <field name="satuan">Gram</field>
+            <field name="harga">250</field>
+            <field name="vendor">Roastery Lokal Bandung</field>
+            <field name="stok_saat_ini">5000</field>
+            <field name="reorder_point">1000</field>
+        </record>
+
+        <record id="bahan_baku_susu_uht" model="janari.bahan.baku">
+            <field name="name">Susu UHT Full Cream</field>
+            <field name="jenis">Bahan Pendukung</field>
+            <field name="satuan">MiliLiter</field>
+            <field name="harga">15</field>
+            <field name="vendor">Distributor Susu</field>
+            <field name="stok_saat_ini">10000</field>
+            <field name="reorder_point">2000</field>
+        </record>
+
+        <record id="bahan_baku_gula_aren" model="janari.bahan.baku">
+            <field name="name">Sirup Gula Aren</field>
+            <field name="jenis">Bahan Pendukung</field>
+            <field name="satuan">MiliLiter</field>
+            <field name="harga">20</field>
+            <field name="stok_saat_ini">2000</field>
+            <field name="reorder_point">500</field>
+        </record>
+
+        <record id="menu_kopi_susu_janari" model="janari.menu">
+            <field name="name">Es Kopi Susu Janari</field>
+            <field name="harga_menu">25000</field>
+            <field name="status_menu">tersedia</field>
+        </record>
+
+        <record id="menu_americano" model="janari.menu">
+            <field name="name">Iced Americano</field>
+            <field name="harga_menu">20000</field>
+            <field name="status_menu">tersedia</field>
+        </record>
+
+        <record id="resep_kopsus_kopi" model="janari.resep">
+            <field name="menu_id" ref="menu_kopi_susu_janari"/>
+            <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
+            <field name="jumlah_bahan">18</field> </record>
+
+        <record id="resep_kopsus_susu" model="janari.resep">
+            <field name="menu_id" ref="menu_kopi_susu_janari"/>
+            <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
+            <field name="jumlah_bahan">150</field> </record>
+
+        <record id="resep_kopsus_gula" model="janari.resep">
+            <field name="menu_id" ref="menu_kopi_susu_janari"/>
+            <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
+            <field name="jumlah_bahan">20</field> </record>
+
+        <record id="resep_americano_kopi" model="janari.resep">
+            <field name="menu_id" ref="menu_americano"/>
+            <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
+            <field name="jumlah_bahan">20</field> </record>
+
+        <record id="pesanan_dummy_01" model="janari.pesanan">
+            <field name="name">ORD-TEST-001</field>
+            <field name="status_pesanan">confirmed</field>
+        </record>
+
+        <record id="detail_pesanan_dummy_01_a" model="janari.detail.pesanan">
+            <field name="pesanan_id" ref="pesanan_dummy_01"/>
+            <field name="menu_id" ref="menu_kopi_susu_janari"/>
+            <field name="jumlah">2</field>
+            <field name="status_item">ordered</field>
+        </record>
+
+        <record id="pesanan_dummy_02" model="janari.pesanan">
+            <field name="name">ORD-TEST-002</field>
+            <field name="status_pesanan">confirmed</field>
+        </record>
+
+        <record id="detail_pesanan_dummy_02_a" model="janari.detail.pesanan">
+            <field name="pesanan_id" ref="pesanan_dummy_02"/>
+            <field name="menu_id" ref="menu_americano"/>
+            <field name="jumlah">1</field>
+            <field name="status_item">processed</field>
+        </record>
+    </data>
+</odoo>
