@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 # D-01 Tabel Bahan Baku
 class BahanBaku(models.Model):
@@ -48,6 +49,11 @@ class Pesanan(models.Model):
 
     name = fields.Char(string='ID Pesanan', required=True, copy=False, readonly=True, default=lambda self: 'New')
     tanggal_pesanan = fields.Datetime(string='Tanggal Pesanan', default=fields.Datetime.now)
+    nomor_meja = fields.Char(string='Nomor Meja / Antrean')
+    sumber_pesanan = fields.Selection([
+        ('offline', 'Offline'),
+        ('online', 'Online')
+    ], string='Sumber Pesanan', default='offline')
     status_pesanan = fields.Selection([
         ('draft', 'Menunggu Pembayaran'),
         ('confirmed', 'Terkonfirmasi'),
@@ -70,21 +76,84 @@ class Pesanan(models.Model):
 class DetailPesanan(models.Model):
     _name = 'janari.detail.pesanan'
     _description = 'Tabel Detail Pesanan'
+    _order = 'pesanan_id asc, id asc'
 
     pesanan_id = fields.Many2one('janari.pesanan', string='Pesanan Reference', required=True, ondelete='cascade')
     menu_id = fields.Many2one('janari.menu', string='Menu', required=True)
     jumlah = fields.Integer(string='Jumlah', default=1, required=True)
+    catatan = fields.Char(string='Catatan Khusus')
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     status_item = fields.Selection([
         ('ordered', 'Ordered'),
         ('processed', 'Processed'),
         ('done', 'Done')
     ], string='Status Dapur (KDS)', default='ordered')
+    processed_at = fields.Datetime(string='Waktu Mulai Proses', readonly=True)
+    done_at = fields.Datetime(string='Waktu Selesai', readonly=True)
+    durasi_tunggu = fields.Integer(
+        string='Durasi Tunggu (menit)',
+        compute='_compute_durasi',
+        store=False,
+    )
+    update_status_ids = fields.One2many('janari.update.status', 'detail_pesanan_id', string='Riwayat Status')
+
+    # Related fields untuk ditampilkan di KDS kanban card
+    nomor_meja = fields.Char(related='pesanan_id.nomor_meja', string='Nomor Meja', store=False, readonly=True)
+    tanggal_pesanan = fields.Datetime(related='pesanan_id.tanggal_pesanan', string='Waktu Pesanan', store=False, readonly=True)
 
     @api.depends('menu_id', 'jumlah')
     def _compute_subtotal(self):
         for record in self:
             record.subtotal = record.menu_id.harga_menu * record.jumlah
+
+    @api.depends('pesanan_id.tanggal_pesanan')
+    def _compute_durasi(self):
+        now = fields.Datetime.now()
+        for record in self:
+            if record.pesanan_id and record.pesanan_id.tanggal_pesanan:
+                delta = now - record.pesanan_id.tanggal_pesanan
+                record.durasi_tunggu = int(delta.total_seconds() / 60)
+            else:
+                record.durasi_tunggu = 0
+
+    def write(self, vals):
+        if 'status_item' in vals:
+            logs = []
+            for record in self:
+                if record.status_item != vals['status_item']:
+                    logs.append({
+                        'detail_pesanan_id': record.id,
+                        'status_before': record.status_item,
+                        'status_after': vals['status_item'],
+                        'updated_by': self.env.user.id,
+                        'updated_at': fields.Datetime.now(),
+                    })
+            result = super().write(vals)
+            for log_vals in logs:
+                self.env['janari.update.status'].create(log_vals)
+            return result
+        return super().write(vals)
+
+    def action_mulai_proses(self):
+        for record in self:
+            if record.status_item != 'ordered':
+                raise UserError('Hanya item dengan status "Ordered" yang bisa diproses.')
+            record.write({
+                'status_item': 'processed',
+                'processed_at': fields.Datetime.now(),
+            })
+
+    def action_selesaikan(self):
+        for record in self:
+            if record.status_item != 'processed':
+                raise UserError('Hanya item dengan status "Processed" yang bisa diselesaikan.')
+            record.write({
+                'status_item': 'done',
+                'done_at': fields.Datetime.now(),
+            })
+            pesanan = record.pesanan_id
+            if all(item.status_item == 'done' for item in pesanan.detail_pesanan_ids):
+                pesanan.status_pesanan = 'done'
 
 # D-07 Tabel Transaksi
 class Transaksi(models.Model):
@@ -103,10 +172,14 @@ class Transaksi(models.Model):
 class UpdateStatus(models.Model):
     _name = 'janari.update.status'
     _description = 'Tabel Riwayat Perubahan Status KDS'
+    _order = 'updated_at desc'
 
-    detail_pesanan_id = fields.Many2one('janari.detail.pesanan', string='Item Pesanan', required=True)
+    detail_pesanan_id = fields.Many2one('janari.detail.pesanan', string='Item Pesanan', required=True, ondelete='cascade')
     status_before = fields.Char(string='Status Sebelum')
     status_after = fields.Char(string='Status Sesudah')
+    updated_by = fields.Many2one('res.users', string='Diubah Oleh', default=lambda self: self.env.user)
+    updated_at = fields.Datetime(string='Waktu Perubahan', default=fields.Datetime.now)
+    note = fields.Char(string='Catatan')
 
 class JanariUser(models.Model):
     _inherit = 'res.users'
