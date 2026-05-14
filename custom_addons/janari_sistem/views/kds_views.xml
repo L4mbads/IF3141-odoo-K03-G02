@@ -53,7 +53,7 @@
                                 </t>
                                 <hr class="mt-1 mb-1"/>
                                 <div class="fw-semibold fs-6">
-                                    <field name="menu_id"/> &amp;times; <field name="jumlah"/>
+                                    <field name="menu_id"/> x <field name="jumlah"/>
                                 </div>
                                 <t t-if="record.catatan.raw_value">
                                     <div class="text-muted fst-italic small mt-1">

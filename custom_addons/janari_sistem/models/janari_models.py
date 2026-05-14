@@ -94,6 +94,16 @@ class Pesanan(models.Model):
     ], string='Status Keseluruhan', default='draft', tracking=True)
     total_harga = fields.Float(string='Total Harga', compute='_compute_total', store=True)
     detail_pesanan_ids = fields.One2many('janari.detail.pesanan', 'pesanan_id', string='Detail Item')
+    transaction_count = fields.Integer(
+        string='Jumlah Transaksi',
+        compute='_compute_transaction_count',
+        store=True
+    )
+
+    @api.depends('status_pesanan')
+    def _compute_transaction_count(self):
+        for record in self:
+            record.transaction_count = 1
 
     @api.depends('detail_pesanan_ids.subtotal')
     def _compute_total(self):
