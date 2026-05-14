@@ -1,6 +1,5 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-
 # D-01 Tabel Bahan Baku
 class BahanBaku(models.Model):
     _name = 'janari.bahan.baku'
@@ -11,9 +10,17 @@ class BahanBaku(models.Model):
     satuan = fields.Char(string='Satuan')
     harga = fields.Float(string='Harga')
     vendor = fields.Char(string='Vendor')
-    stok_saat_ini = fields.Integer(string='Stok Saat Ini', default=0)
-    reorder_point = fields.Integer(string='Reorder Point', default=10)
+    stok_saat_ini = fields.Float(string='Stok Saat Ini', default=0)
+    reorder_point = fields.Float(string='Reorder Point', default=10)
     is_low_stock = fields.Boolean(string="Status Stok Rendah", compute="_compute_low_stock", store=True)
+
+    def action_new_bahan_baku(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'janari.bahan.baku',
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     @api.depends('stok_saat_ini', 'reorder_point')
     def _compute_low_stock(self):
@@ -71,7 +78,31 @@ class Pesanan(models.Model):
     def action_confirm(self):
         for record in self:
             if record.status_pesanan == 'draft':
+                for item in record.detail_pesanan_ids:
+                    for resep in item.menu_id.resep_ids:
+                        kebutuhan = resep.jumlah_bahan * item.jumlah
+                        if resep.bahan_baku_id.stok_saat_ini < kebutuhan:
+                            raise UserError(
+                                f"Stok '{resep.bahan_baku_id.name}' tidak cukup! "
+                                f"Dibutuhkan: {kebutuhan} {resep.bahan_baku_id.satuan}, "
+                                f"Tersedia: {resep.bahan_baku_id.stok_saat_ini}"
+                            )
+                for item in record.detail_pesanan_ids:
+                    for resep in item.menu_id.resep_ids:
+                        resep.bahan_baku_id.stok_saat_ini -= resep.jumlah_bahan * item.jumlah
                 record.status_pesanan = 'confirmed'
+
+                low_stock_bahan = record.detail_pesanan_ids.mapped('menu_id.resep_ids.bahan_baku_id').filtered(lambda b: b.is_low_stock)
+                if low_stock_bahan:
+                    nama_bahan = ', '.join(low_stock_bahan.mapped('name'))
+                    self.env['bus.bus']._sendone(
+                        'janari_low_stock',
+                        'janari_low_stock_alert',
+                        {
+                            'title': 'Peringatan Stok Rendah',
+                            'message': f'Stok berikut di bawah reorder point: {nama_bahan}',
+                        }
+                    )
 
 # D-06 Tabel Detail Pesanan
 class DetailPesanan(models.Model):
@@ -197,3 +228,36 @@ class JanariUser(models.Model):
         ('kepala_staf', 'Kepala Staf'),
         ('pemilik', 'Pemilik')
     ], string='Role Sistem Janari')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        users = super(JanariUser, self).create(vals_list)
+        for user in users:
+            user._update_janari_groups()
+        return users
+
+    def write(self, vals):
+        res = super(JanariUser, self).write(vals)
+        if 'janari_role' in vals:
+            self._update_janari_groups()
+        return res
+
+    def _update_janari_groups(self):
+        for user in self:
+            group_map = {
+                'kasir': 'janari_sistem.group_janari_kasir',
+                'packer': 'janari_sistem.group_janari_packer',
+                'dapur': 'janari_sistem.group_janari_dapur',
+                'kepala_staf': 'janari_sistem.group_janari_kepala_staf',
+                'pemilik': 'janari_sistem.group_janari_pemilik',
+            }
+
+            # hapus semua grup Janari agar tidak double role
+            all_janari_groups = [self.env.ref(xml_id).id for xml_id in group_map.values() if self.env.ref(xml_id, raise_if_not_found=False)]
+            user.write({'groups_id': [(3, gid) for gid in all_janari_groups]})
+
+            if user.janari_role and user.janari_role in group_map:
+                group_xml_id = group_map[user.janari_role]
+                group = self.env.ref(group_xml_id, raise_if_not_found=False)
+                if group:
+                    user.write({'groups_id': [(4, group.id)]})
