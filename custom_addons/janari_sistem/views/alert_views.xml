@@ -22,5 +22,5 @@
         <field name="view_id" ref="view_janari_alert_tree"/>
     </record>
 
-    <menuitem id="menu_janari_alert" name="Peringatan Stok" parent="menu_janari_inventory" action="action_janari_alert_stok" sequence="40"/>
+    <menuitem id="menu_janari_alert" name="Peringatan Stok" parent="menu_janari_inventory" action="action_janari_alert_stok" sequence="40" groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
 </odoo>

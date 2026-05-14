@@ -56,5 +56,5 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_janari_pos_order" name="Pesanan Baru" parent="menu_janari_pos" action="action_janari_pesanan" sequence="10"/>
+    <menuitem id="menu_janari_pos_order" name="Pesanan Baru" parent="menu_janari_pos" action="action_janari_pesanan" sequence="10" groups="janari_sistem.group_janari_kasir"/>
 </odoo>

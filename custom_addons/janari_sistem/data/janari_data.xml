@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
         <!-- ===================== BAHAN BAKU (3) ===================== -->
+    
         <record id="bahan_baku_kopi_arabica" model="janari.bahan.baku">
             <field name="name">Biji Kopi Arabica</field>
             <field name="jenis">Bahan Utama</field>
@@ -172,6 +172,27 @@
             <field name="updated_by" ref="base.user_admin"/>
             <field name="updated_at">2026-05-14 09:30:00</field>
         </record>
+        
+        <!-- User Dummy -->
+        <record id="user_kasir_dummy" model="res.users">
+            <field name="name">Andi Kasir</field>
+            <field name="login">kasir</field>
+            <field name="password">kasir123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_kasir')])]"/>
+        </record>
 
+        <record id="user_dapur_dummy" model="res.users">
+            <field name="name">Doni Dapur</field>
+            <field name="login">dapur</field>
+            <field name="password">dapur123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_dapur')])]"/>
+        </record>
+
+        <record id="user_pemilik_dummy" model="res.users">
+            <field name="name">Bapak Pemilik</field>
+            <field name="login">pemilik</field>
+            <field name="password">pemilik123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_pemilik')])]"/>
+        </record>
     </data>
 </odoo>

@@ -35,5 +35,5 @@
           parent="menu_janari_root"
           sequence="40"
           groups="group_janari_kepala_staf,group_janari_pemilik,base.group_system"/>
-    <menuitem id="menu_janari_laporan_harian" name="Rekapitulasi Harian" parent="menu_janari_laporan_root" action="action_janari_laporan" sequence="10"/>
+    <menuitem id="menu_janari_laporan_harian" name="Rekapitulasi Harian" parent="menu_janari_laporan_root" action="action_janari_laporan" sequence="10" groups="janari_sistem.group_janari_pemilik"/>
 </odoo>
