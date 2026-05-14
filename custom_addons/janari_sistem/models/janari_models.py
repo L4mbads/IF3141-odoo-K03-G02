@@ -118,3 +118,36 @@ class JanariUser(models.Model):
         ('kepala_staf', 'Kepala Staf'),
         ('pemilik', 'Pemilik')
     ], string='Role Sistem Janari')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        users = super(JanariUser, self).create(vals_list)
+        for user in users:
+            user._update_janari_groups()
+        return users
+
+    def write(self, vals):
+        res = super(JanariUser, self).write(vals)
+        if 'janari_role' in vals:
+            self._update_janari_groups()
+        return res
+
+    def _update_janari_groups(self):
+        for user in self:
+            group_map = {
+                'kasir': 'janari_sistem.group_janari_kasir',
+                'packer': 'janari_sistem.group_janari_packer',
+                'dapur': 'janari_sistem.group_janari_dapur',
+                'kepala_staf': 'janari_sistem.group_janari_kepala_staf',
+                'pemilik': 'janari_sistem.group_janari_pemilik',
+            }
+
+            # hapus semua grup Janari agar tidak double role
+            all_janari_groups = [self.env.ref(xml_id).id for xml_id in group_map.values() if self.env.ref(xml_id, raise_if_not_found=False)]
+            user.write({'groups_id': [(3, gid) for gid in all_janari_groups]})
+
+            if user.janari_role and user.janari_role in group_map:
+                group_xml_id = group_map[user.janari_role]
+                group = self.env.ref(group_xml_id, raise_if_not_found=False)
+                if group:
+                    user.write({'groups_id': [(4, group.id)]})
