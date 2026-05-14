@@ -9,8 +9,9 @@
                 <field name="name"/>
                 <field name="jenis"/>
                 <field name="stok_saat_ini"/>
+                <field name="satuan"/>
                 <field name="reorder_point"/>
-                <field name="is_low_stock" invisible="1"/>
+                <field name="is_low_stock" column_invisible="1"/>
             </tree>
         </field>
     </record>

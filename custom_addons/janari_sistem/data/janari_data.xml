@@ -1,10 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="satuan_gram" model="janari.satuan">
+            <field name="name">Gram</field><field name="category">berat</field><field name="factor">1</field>
+        </record>
+        <record id="satuan_kg" model="janari.satuan">
+            <field name="name">Kilogram</field><field name="category">berat</field><field name="factor">1000</field>
+        </record>
+        <record id="satuan_ml" model="janari.satuan">
+            <field name="name">Mililiter</field><field name="category">volume</field><field name="factor">1</field>
+        </record>
+        <record id="satuan_liter" model="janari.satuan">
+            <field name="name">Liter</field><field name="category">volume</field><field name="factor">1000</field>
+        </record>
+        <record id="satuan_buah" model="janari.satuan">
+            <field name="name">Buah</field><field name="category">jumlah</field><field name="factor">1</field>
+        </record>
+        <record id="satuan_sdm" model="janari.satuan">
+            <field name="name">Sendok Makan</field><field name="category">volume</field><field name="factor">15</field>
+        </record>
+        <record id="satuan_sdt" model="janari.satuan">
+            <field name="name">Sendok Teh</field><field name="category">volume</field><field name="factor">5</field>
+        </record>
+        <record id="satuan_porsi" model="janari.satuan">
+            <field name="name">Porsi</field><field name="category">jumlah</field><field name="factor">1</field>
+        </record>
+        <record id="satuan_sachet" model="janari.satuan">
+            <field name="name">Sachet</field><field name="category">jumlah</field><field name="factor">1</field>
+        </record>
+
         <record id="bahan_baku_kopi_arabica" model="janari.bahan.baku">
             <field name="name">Biji Kopi Arabica</field>
             <field name="jenis">Bahan Utama</field>
-            <field name="satuan">Gram</field>
+            <field name="satuan" ref="satuan_gram"/>
             <field name="harga">250</field>
             <field name="vendor">Roastery Lokal Bandung</field>
             <field name="stok_saat_ini">5000</field>
@@ -14,7 +42,7 @@
         <record id="bahan_baku_susu_uht" model="janari.bahan.baku">
             <field name="name">Susu UHT Full Cream</field>
             <field name="jenis">Bahan Pendukung</field>
-            <field name="satuan">MiliLiter</field>
+            <field name="satuan" ref="satuan_ml"/>
             <field name="harga">15</field>
             <field name="vendor">Distributor Susu</field>
             <field name="stok_saat_ini">10000</field>
@@ -24,7 +52,7 @@
         <record id="bahan_baku_gula_aren" model="janari.bahan.baku">
             <field name="name">Sirup Gula Aren</field>
             <field name="jenis">Bahan Pendukung</field>
-            <field name="satuan">MiliLiter</field>
+            <field name="satuan" ref="satuan_ml"/>
             <field name="harga">20</field>
             <field name="stok_saat_ini">2000</field>
             <field name="reorder_point">500</field>

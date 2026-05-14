@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_satuan_admin,satuan.admin,model_janari_satuan,base.group_system,1,1,1,1
+access_satuan_kepala,satuan.kepala,model_janari_satuan,janari_sistem.group_janari_kepala_staf,1,1,1,1
 access_bahan_baku_admin,bahan.baku.admin,model_janari_bahan_baku,base.group_system,1,1,1,1
 access_resep_admin,resep.admin,model_janari_resep,base.group_system,1,1,1,1
 access_menu_admin,menu.admin,model_janari_menu,base.group_system,1,1,1,1

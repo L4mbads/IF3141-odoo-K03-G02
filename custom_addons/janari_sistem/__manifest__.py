@@ -19,12 +19,7 @@
         'views/user_views.xml',
         'data/janari_data.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'janari_sistem/static/src/js/low_stock_notification.js',
-        ],
-    },
-    'installable': True,
+'installable': True,
     'application': True,
     'auto_install': False,
 }
