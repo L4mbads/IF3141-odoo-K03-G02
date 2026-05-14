@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
+        <!-- ===================== BAHAN BAKU (3) ===================== -->
         <record id="bahan_baku_kopi_arabica" model="janari.bahan.baku">
             <field name="name">Biji Kopi Arabica</field>
             <field name="jenis">Bahan Utama</field>
@@ -30,6 +32,7 @@
             <field name="reorder_point">500</field>
         </record>
 
+        <!-- ===================== MENU (3) ===================== -->
         <record id="menu_kopi_susu_janari" model="janari.menu">
             <field name="name">Es Kopi Susu Janari</field>
             <field name="harga_menu">25000</field>
@@ -42,28 +45,56 @@
             <field name="status_menu">tersedia</field>
         </record>
 
+        <record id="menu_matcha_latte" model="janari.menu">
+            <field name="name">Matcha Latte</field>
+            <field name="harga_menu">28000</field>
+            <field name="status_menu">tersedia</field>
+        </record>
+
+        <!-- ===================== RESEP / BOM ===================== -->
         <record id="resep_kopsus_kopi" model="janari.resep">
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
-            <field name="jumlah_bahan">18</field> </record>
+            <field name="jumlah_bahan">18</field>
+        </record>
 
         <record id="resep_kopsus_susu" model="janari.resep">
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
-            <field name="jumlah_bahan">150</field> </record>
+            <field name="jumlah_bahan">150</field>
+        </record>
 
         <record id="resep_kopsus_gula" model="janari.resep">
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
-            <field name="jumlah_bahan">20</field> </record>
+            <field name="jumlah_bahan">20</field>
+        </record>
 
         <record id="resep_americano_kopi" model="janari.resep">
             <field name="menu_id" ref="menu_americano"/>
             <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
-            <field name="jumlah_bahan">20</field> </record>
+            <field name="jumlah_bahan">20</field>
+        </record>
 
+        <record id="resep_matcha_susu" model="janari.resep">
+            <field name="menu_id" ref="menu_matcha_latte"/>
+            <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
+            <field name="jumlah_bahan">200</field>
+        </record>
+
+        <record id="resep_matcha_gula" model="janari.resep">
+            <field name="menu_id" ref="menu_matcha_latte"/>
+            <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
+            <field name="jumlah_bahan">15</field>
+        </record>
+
+        <!-- ===================== PESANAN (3) ===================== -->
+
+        <!-- Pesanan 1 — status ordered (tampil merah di KDS) -->
         <record id="pesanan_dummy_01" model="janari.pesanan">
             <field name="name">ORD-TEST-001</field>
+            <field name="nomor_meja">A1</field>
+            <field name="sumber_pesanan">offline</field>
             <field name="status_pesanan">confirmed</field>
         </record>
 
@@ -71,11 +102,22 @@
             <field name="pesanan_id" ref="pesanan_dummy_01"/>
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="jumlah">2</field>
+            <field name="catatan">tidak terlalu manis</field>
             <field name="status_item">ordered</field>
         </record>
 
+        <record id="detail_pesanan_dummy_01_b" model="janari.detail.pesanan">
+            <field name="pesanan_id" ref="pesanan_dummy_01"/>
+            <field name="menu_id" ref="menu_americano"/>
+            <field name="jumlah">1</field>
+            <field name="status_item">ordered</field>
+        </record>
+
+        <!-- Pesanan 2 — status processed (tampil kuning di KDS) -->
         <record id="pesanan_dummy_02" model="janari.pesanan">
             <field name="name">ORD-TEST-002</field>
+            <field name="nomor_meja">B3</field>
+            <field name="sumber_pesanan">online</field>
             <field name="status_pesanan">confirmed</field>
         </record>
 
@@ -83,7 +125,53 @@
             <field name="pesanan_id" ref="pesanan_dummy_02"/>
             <field name="menu_id" ref="menu_americano"/>
             <field name="jumlah">1</field>
+            <field name="catatan">es batu dipisah</field>
             <field name="status_item">processed</field>
         </record>
+
+        <!-- Pesanan 3 — mix ordered dan processed (tampil di KDS) -->
+        <record id="pesanan_dummy_03" model="janari.pesanan">
+            <field name="name">ORD-TEST-003</field>
+            <field name="nomor_meja">C2</field>
+            <field name="sumber_pesanan">offline</field>
+            <field name="status_pesanan">confirmed</field>
+        </record>
+
+        <record id="detail_pesanan_dummy_03_a" model="janari.detail.pesanan">
+            <field name="pesanan_id" ref="pesanan_dummy_03"/>
+            <field name="menu_id" ref="menu_matcha_latte"/>
+            <field name="jumlah">2</field>
+            <field name="catatan">gula dipisah</field>
+            <field name="status_item">ordered</field>
+        </record>
+
+        <record id="detail_pesanan_dummy_03_b" model="janari.detail.pesanan">
+            <field name="pesanan_id" ref="pesanan_dummy_03"/>
+            <field name="menu_id" ref="menu_kopi_susu_janari"/>
+            <field name="jumlah">1</field>
+            <field name="status_item">processed</field>
+        </record>
+
+        <!-- ===================== LOG RIWAYAT STATUS ===================== -->
+
+        <!-- ORD-002 item 1: ordered → processed -->
+        <record id="log_dummy_02_a_processed" model="janari.update.status">
+            <field name="detail_pesanan_id" ref="detail_pesanan_dummy_02_a"/>
+            <field name="status_before">ordered</field>
+            <field name="status_after">processed</field>
+            <field name="updated_by" ref="base.user_admin"/>
+            <field name="updated_at">2026-05-14 09:15:00</field>
+            <field name="note">Mulai diproses</field>
+        </record>
+
+        <!-- ORD-003 item B: ordered → processed -->
+        <record id="log_dummy_03_b_processed" model="janari.update.status">
+            <field name="detail_pesanan_id" ref="detail_pesanan_dummy_03_b"/>
+            <field name="status_before">ordered</field>
+            <field name="status_after">processed</field>
+            <field name="updated_by" ref="base.user_admin"/>
+            <field name="updated_at">2026-05-14 09:30:00</field>
+        </record>
+
     </data>
 </odoo>

@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Search View for KDS -->
+    <record id="view_janari_kds_search" model="ir.ui.view">
+        <field name="name">janari.detail.pesanan.search</field>
+        <field name="model">janari.detail.pesanan</field>
+        <field name="arch" type="xml">
+            <search string="Cari Pesanan KDS">
+                <field name="menu_id" string="Menu"/>
+                <field name="pesanan_id" string="Nomor Pesanan"/>
+                <separator/>
+                <filter name="filter_ordered" string="Ordered" domain="[('status_item', '=', 'ordered')]"/>
+                <filter name="filter_processed" string="Processed" domain="[('status_item', '=', 'processed')]"/>
+                <filter name="filter_done" string="Done" domain="[('status_item', '=', 'done')]"/>
+                <filter name="filter_aktif" string="Semua Aktif" domain="[('status_item', 'in', ['ordered', 'processed'])]"/>
+                <filter name="filter_hari_ini" string="Hari Ini" domain="[('tanggal_pesanan', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status" context="{'group_by': 'status_item'}"/>
+                    <filter name="group_pesanan" string="Pesanan" context="{'group_by': 'pesanan_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Kanban View for KDS - enriched -->
     <record id="view_janari_kds_kanban" model="ir.ui.view">
         <field name="name">janari.detail.pesanan.kanban</field>
         <field name="model">janari.detail.pesanan</field>
@@ -8,19 +31,42 @@
                 <field name="menu_id"/>
                 <field name="jumlah"/>
                 <field name="status_item"/>
+                <field name="pesanan_id"/>
+                <field name="catatan"/>
+                <field name="durasi_tunggu"/>
+                <field name="nomor_meja"/>
+                <field name="tanggal_pesanan"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click o_kanban_record">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record border-start border-4 ps-2 #{record.status_item.raw_value == 'ordered' ? 'border-danger' : record.status_item.raw_value == 'processed' ? 'border-warning' : 'border-success'}">
                             <div class="oe_kanban_details">
-                                <strong class="o_kanban_record_title">
-                                    <field name="menu_id"/>
-                                </strong>
-                                <div>
-                                    <span>Jumlah: <field name="jumlah"/></span>
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="pesanan_id"/>
+                                    </strong>
+                                    <field name="status_item" widget="label_selection" options="{'classes': {'ordered': 'danger', 'processed': 'warning', 'done': 'success'}}"/>
                                 </div>
-                                <div class="o_kanban_record_bottom">
-                                    <div class="oe_kanban_bottom_left">
-                                        <field name="status_item" widget="label_selection" options="{'classes': {'ordered': 'default', 'processed': 'warning', 'done': 'success'}}"/>
+                                <t t-if="record.nomor_meja.raw_value">
+                                    <div class="text-muted small">
+                                        Meja: <t t-esc="record.nomor_meja.value"/>
+                                    </div>
+                                </t>
+                                <hr class="mt-1 mb-1"/>
+                                <div class="fw-semibold fs-6">
+                                    <field name="menu_id"/> &amp;times; <field name="jumlah"/>
+                                </div>
+                                <t t-if="record.catatan.raw_value">
+                                    <div class="text-muted fst-italic small mt-1">
+                                        Catatan: <t t-esc="record.catatan.value"/>
+                                    </div>
+                                </t>
+                                <div class="o_kanban_record_bottom mt-2">
+                                    <div class="oe_kanban_bottom_left text-muted small">
+                                        <i class="fa fa-clock-o me-1"/>
+                                        <t t-esc="record.durasi_tunggu.value"/> menit
+                                    </div>
+                                    <div class="oe_kanban_bottom_right text-muted small">
+                                        <field name="tanggal_pesanan" widget="datetime"/>
                                     </div>
                                 </div>
                             </div>
@@ -31,11 +77,98 @@
         </field>
     </record>
 
+    <!-- Form View for KDS Detail -->
+    <record id="view_janari_kds_form" model="ir.ui.view">
+        <field name="name">janari.detail.pesanan.kds.form</field>
+        <field name="model">janari.detail.pesanan</field>
+        <field name="arch" type="xml">
+            <form string="Detail Pesanan KDS">
+                <header>
+                    <button name="action_mulai_proses" string="Mulai Proses" type="object"
+                            class="btn-warning"
+                            groups="janari_sistem.group_janari_packer"
+                            invisible="status_item != 'ordered'"/>
+                    <button name="action_selesaikan" string="Selesaikan" type="object"
+                            class="btn-success"
+                            groups="janari_sistem.group_janari_packer"
+                            invisible="status_item != 'processed'"/>
+                    <field name="status_item" widget="statusbar" statusbar_visible="ordered,processed,done"/>
+                </header>
+                <sheet>
+                    <group string="Informasi Pesanan">
+                        <group>
+                            <field name="pesanan_id" readonly="1"/>
+                            <field name="nomor_meja" readonly="1"/>
+                            <field name="tanggal_pesanan" readonly="1"/>
+                            <field name="durasi_tunggu" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="processed_at" readonly="1"/>
+                            <field name="done_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Detail Item">
+                        <group>
+                            <field name="menu_id" readonly="1"/>
+                            <field name="jumlah" readonly="1"/>
+                            <field name="catatan" readonly="1"/>
+                            <field name="subtotal" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Riwayat Status">
+                            <field name="update_status_ids" readonly="1">
+                                <tree>
+                                    <field name="updated_at"/>
+                                    <field name="status_before"/>
+                                    <field name="status_after"/>
+                                    <field name="updated_by"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Log View for UpdateStatus -->
+    <record id="view_janari_update_status_tree" model="ir.ui.view">
+        <field name="name">janari.update.status.tree</field>
+        <field name="model">janari.update.status</field>
+        <field name="arch" type="xml">
+            <tree string="Log Riwayat Status" create="false" edit="false" delete="false">
+                <field name="updated_at"/>
+                <field name="detail_pesanan_id"/>
+                <field name="status_before"/>
+                <field name="status_after"/>
+                <field name="updated_by"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action for KDS (kanban + form) -->
     <record id="action_janari_kds" model="ir.actions.act_window">
         <field name="name">Kitchen Display System</field>
         <field name="res_model">janari.detail.pesanan</field>
-        <field name="view_mode">kanban</field>
-        <field name="domain">[('status_item', '!=', 'done')]</field> </record>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('status_item', '!=', 'done')]</field>
+        <field name="search_view_id" ref="view_janari_kds_search"/>
+        <field name="context">{'search_default_filter_aktif': 1}</field>
+    </record>
 
+    <!-- Action for UpdateStatus Log -->
+    <record id="action_janari_update_status_log" model="ir.actions.act_window">
+        <field name="name">Log Riwayat Status</field>
+        <field name="res_model">janari.update.status</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- Menu Items -->
     <menuitem id="menu_janari_kds_screen" name="Layar Dapur" parent="menu_janari_kds" action="action_janari_kds" sequence="10"/>
+    <menuitem id="menu_janari_kds_log" name="Log Riwayat Status" parent="menu_janari_kds"
+              action="action_janari_update_status_log" sequence="20"
+              groups="janari_sistem.group_janari_packer,janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
 </odoo>
