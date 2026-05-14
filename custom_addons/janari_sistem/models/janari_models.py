@@ -46,6 +46,7 @@ class Resep(models.Model):
 class Pesanan(models.Model):
     _name = 'janari.pesanan'
     _description = 'Tabel Pesanan'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='ID Pesanan', required=True, copy=False, readonly=True, default=lambda self: 'New')
     tanggal_pesanan = fields.Datetime(string='Tanggal Pesanan', default=fields.Datetime.now)
@@ -58,7 +59,7 @@ class Pesanan(models.Model):
         ('draft', 'Menunggu Pembayaran'),
         ('confirmed', 'Terkonfirmasi'),
         ('done', 'Selesai')
-    ], string='Status Keseluruhan', default='draft')
+    ], string='Status Keseluruhan', default='draft', tracking=True)
     total_harga = fields.Float(string='Total Harga', compute='_compute_total', store=True)
     detail_pesanan_ids = fields.One2many('janari.detail.pesanan', 'pesanan_id', string='Detail Item')
 
@@ -154,6 +155,11 @@ class DetailPesanan(models.Model):
             pesanan = record.pesanan_id
             if all(item.status_item == 'done' for item in pesanan.detail_pesanan_ids):
                 pesanan.status_pesanan = 'done'
+                pesanan.message_post(
+                    body=f'Pesanan <b>{pesanan.name}</b> (Meja {pesanan.nomor_meja or "-"}) sudah selesai dan siap diserahkan ke pelanggan.',
+                    message_type='notification',
+                    subtype_xmlid='mail.mt_comment',
+                )
 
 # D-07 Tabel Transaksi
 class Transaksi(models.Model):
