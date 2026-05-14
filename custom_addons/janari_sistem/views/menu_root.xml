@@ -2,7 +2,21 @@
 <odoo>
     <menuitem id="menu_janari_root" name="Sistem Janari" sequence="10"/>
 
-    <menuitem id="menu_janari_pos" name="Point of Sale" parent="menu_janari_root" sequence="10"/>
-    <menuitem id="menu_janari_kds" name="Kitchen Display" parent="menu_janari_root" sequence="20"/>
-    <menuitem id="menu_janari_inventory" name="Inventory &amp; BOM" parent="menu_janari_root" sequence="30"/>
+    <menuitem id="menu_janari_pos" 
+              name="Point of Sale" 
+              parent="menu_janari_root" 
+              sequence="10" 
+              groups="janari_sistem.group_janari_kasir"/>
+
+    <menuitem id="menu_janari_kds" 
+              name="Kitchen Display" 
+              parent="menu_janari_root" 
+              sequence="20" 
+              groups="janari_sistem.group_janari_dapur,janari_sistem.group_janari_packer"/>
+
+    <menuitem id="menu_janari_inventory" 
+              name="Inventory &amp; BOM" 
+              parent="menu_janari_root" 
+              sequence="30" 
+              groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
 </odoo>
