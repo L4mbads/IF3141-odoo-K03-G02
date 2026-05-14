@@ -17,6 +17,26 @@
         <field name="name">Manajemen Pengguna</field>
         <field name="res_model">res.users</field>
         <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="base.view_users_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Kelola pengguna dan hak akses Sistem Janari di sini.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_janari_user_management_view_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="base.view_users_tree"/>
+        <field name="act_window_id" ref="action_janari_user_management"/>
+    </record>
+
+    <record id="action_janari_user_management_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="base.view_users_form"/>
+        <field name="act_window_id" ref="action_janari_user_management"/>
     </record>
 
     <!-- <menuitem id="menu_janari_admin_root" name="Administrasi" parent="menu_janari_root" sequence="50" groups="janari_sistem.group_janari_pemilik"/> -->
