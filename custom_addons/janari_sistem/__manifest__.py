@@ -5,7 +5,7 @@
     'description': 'Modul custom untuk Milestone 4 IF3141 Sistem Informasi ITB.',
     'author': 'Kelompok 02 - K03',
     'category': 'Operations',
-    'depends': ['base', 'mail'], # mail buat fitur chatter/audit trail bawaan Odoo
+    'depends': ['base', 'mail', 'bus'],
     'data': [
         'security/janari_security.xml',
         'security/ir.model.access.csv',
@@ -19,6 +19,11 @@
         'views/user_views.xml',
         'data/janari_data.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'janari_sistem/static/src/js/low_stock_notification.js',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,
