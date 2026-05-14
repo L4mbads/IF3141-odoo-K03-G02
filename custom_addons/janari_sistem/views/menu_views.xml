@@ -31,6 +31,7 @@
                                 <tree editable="bottom">
                                     <field name="bahan_baku_id"/>
                                     <field name="jumlah_bahan"/>
+                                    <field name="satuan"/>
                                 </tree>
                             </field>
                         </page>

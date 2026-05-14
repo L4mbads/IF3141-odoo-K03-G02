@@ -1,5 +1,24 @@
+import logging
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
+
+class Satuan(models.Model):
+    _name = 'janari.satuan'
+    _description = 'Satuan Bahan Baku'
+
+    name = fields.Char(string='Satuan', required=True)
+    category = fields.Selection([
+        ('berat', 'Berat'),
+        ('volume', 'Volume'),
+        ('jumlah', 'Jumlah'),
+    ], string='Kategori', required=True, default='jumlah')
+    factor = fields.Float(
+        string='Faktor ke Satuan Terkecil', default=1.0,
+        help='Contoh: Kilogram=1000 (1kg=1000g), Liter=1000 (1L=1000ml), Gram=1'
+    )
+
 # D-01 Tabel Bahan Baku
 class BahanBaku(models.Model):
     _name = 'janari.bahan.baku'
@@ -7,7 +26,7 @@ class BahanBaku(models.Model):
 
     name = fields.Char(string='Nama Bahan', required=True)
     jenis = fields.Char(string='Jenis')
-    satuan = fields.Char(string='Satuan')
+    satuan = fields.Many2one('janari.satuan', string='Satuan')
     harga = fields.Float(string='Harga')
     vendor = fields.Char(string='Vendor')
     stok_saat_ini = fields.Float(string='Stok Saat Ini', default=0)
@@ -48,6 +67,12 @@ class Resep(models.Model):
     menu_id = fields.Many2one('janari.menu', string='Menu', required=True, ondelete='cascade')
     bahan_baku_id = fields.Many2one('janari.bahan.baku', string='Bahan Baku', required=True)
     jumlah_bahan = fields.Float(string='Jumlah Bahan', required=True)
+    satuan = fields.Many2one('janari.satuan', string='Satuan', required=True)
+
+    @api.onchange('bahan_baku_id')
+    def _onchange_bahan_baku(self):
+        if self.bahan_baku_id and self.bahan_baku_id.satuan:
+            self.satuan = self.bahan_baku_id.satuan
 
 # D-05 Tabel Pesanan
 class Pesanan(models.Model):
@@ -75,34 +100,72 @@ class Pesanan(models.Model):
         for record in self:
             record.total_harga = sum(item.subtotal for item in record.detail_pesanan_ids)
 
+    def _convert_satuan(self, jumlah, dari_satuan, ke_satuan, nama_bahan):
+        if not dari_satuan or not ke_satuan or dari_satuan == ke_satuan:
+            return jumlah
+        if dari_satuan.category != ke_satuan.category:
+            raise UserError(
+                f"Satuan tidak kompatibel untuk '{nama_bahan}': "
+                f"{dari_satuan.name} ({dari_satuan.category}) "
+                f"tidak bisa dikonversi ke {ke_satuan.name} ({ke_satuan.category})"
+            )
+        return jumlah * dari_satuan.factor / ke_satuan.factor
+
     def action_confirm(self):
         for record in self:
             if record.status_pesanan == 'draft':
                 for item in record.detail_pesanan_ids:
                     for resep in item.menu_id.resep_ids:
-                        kebutuhan = resep.jumlah_bahan * item.jumlah
-                        if resep.bahan_baku_id.stok_saat_ini < kebutuhan:
+                        kebutuhan_stok = self._convert_satuan(
+                            resep.jumlah_bahan * item.jumlah,
+                            resep.satuan,
+                            resep.bahan_baku_id.satuan,
+                            resep.bahan_baku_id.name,
+                        )
+                        if resep.bahan_baku_id.stok_saat_ini < kebutuhan_stok:
+                            satuan_name = resep.bahan_baku_id.satuan.name or ''
                             raise UserError(
                                 f"Stok '{resep.bahan_baku_id.name}' tidak cukup! "
-                                f"Dibutuhkan: {kebutuhan} {resep.bahan_baku_id.satuan}, "
+                                f"Dibutuhkan: {kebutuhan_stok} {satuan_name}, "
                                 f"Tersedia: {resep.bahan_baku_id.stok_saat_ini}"
                             )
                 for item in record.detail_pesanan_ids:
                     for resep in item.menu_id.resep_ids:
-                        resep.bahan_baku_id.stok_saat_ini -= resep.jumlah_bahan * item.jumlah
+                        kebutuhan_stok = self._convert_satuan(
+                            resep.jumlah_bahan * item.jumlah,
+                            resep.satuan,
+                            resep.bahan_baku_id.satuan,
+                            resep.bahan_baku_id.name,
+                        )
+                        resep.bahan_baku_id.stok_saat_ini -= kebutuhan_stok
                 record.status_pesanan = 'confirmed'
 
-                low_stock_bahan = record.detail_pesanan_ids.mapped('menu_id.resep_ids.bahan_baku_id').filtered(lambda b: b.is_low_stock)
+                low_stock_bahan = record.detail_pesanan_ids.mapped('menu_id.resep_ids.bahan_baku_id').filtered(
+                    lambda b: b.stok_saat_ini <= b.reorder_point
+                )
+                _logger.warning("JANARI DEBUG: low_stock_bahan = %s", low_stock_bahan.mapped('name'))
                 if low_stock_bahan:
                     nama_bahan = ', '.join(low_stock_bahan.mapped('name'))
-                    self.env['bus.bus']._sendone(
-                        'janari_low_stock',
-                        'janari_low_stock_alert',
-                        {
+                    channel = self.env['discuss.channel'].sudo().search(
+                        [('name', '=', 'general')], limit=1
+                    )
+                    _logger.warning("JANARI DEBUG: channel = %s", channel)
+                    if channel:
+                        channel.sudo().message_post(
+                            body=f'⚠️ Peringatan Stok Rendah: Stok berikut di bawah reorder point: {nama_bahan}',
+                            message_type='comment',
+                            subtype_xmlid='mail.mt_comment',
+                        )
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
                             'title': 'Peringatan Stok Rendah',
                             'message': f'Stok berikut di bawah reorder point: {nama_bahan}',
+                            'type': 'warning',
+                            'sticky': True,
                         }
-                    )
+                    }
 
 # D-06 Tabel Detail Pesanan
 class DetailPesanan(models.Model):
