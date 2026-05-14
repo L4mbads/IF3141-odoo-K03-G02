@@ -1,0 +1,202 @@
+Scope utama Danendra
+
+Danendra bertanggung jawab membuat fitur yang menjawab masalah: pesanan dari kasir ke dapur masih verbal/struk kertas, sehingga rawan salah menu, pesanan terlewat, atau miskomunikasi. Solusinya adalah layar KDS yang menampilkan antrean pesanan aktif dan status pengerjaan secara real-time.
+
+Secara aktor, modul Danendra melibatkan:
+
+Actor	Peran terhadap fitur Danendra
+Staf Packer	Aktor utama. Bisa melihat antrean dan mengubah status pesanan.
+Staf Dapur	Aktor utama tetapi view-only. Hanya melihat antrean sebagai acuan memasak.
+Staf Kasir	Aktor penerima dampak. Kasir membuat pesanan di POS dan menerima info ketika pesanan sudah done.
+Pemilik / Kepala Staf	Aktor pemantau opsional. Bisa melihat status alur produksi untuk monitoring, tetapi bukan operator utama KDS.
+
+Di Milestone 4, Staf Packer dijelaskan sebagai aktor yang memperbarui status pesanan pada KDS, sedangkan Staf Dapur hanya melihat antrean secara view-only tanpa wewenang mengubah data.
+
+Fitur spesifik yang dibuat Danendra
+F-DN-01 — Tampilan Antrean Pesanan KDS
+
+Nama fitur: Kitchen Display System - Order Queue Display
+Actor utama: Staf Dapur dan Staf Packer
+Actor tambahan: Pemilik/Kepala Staf sebagai pemantau opsional
+Jenis akses:
+Staf Dapur = view-only.
+Staf Packer = view + update status.
+
+Fitur ini menampilkan seluruh pesanan aktif yang sudah dikirim dari POS ke layar dapur. Tujuannya adalah supaya tim dapur tidak lagi bergantung pada instruksi lisan dari kasir atau struk kertas. Di DFD Level 1, proses Manajemen Antrean KDS mengambil data pesanan aktif dan menampilkannya kepada Staff Dapur dan Staff Packer; perubahan status kemudian diperbarui secara real-time ke tabel antrean.
+
+Data yang harus tampil di setiap kartu pesanan:
+
+Elemen data	Keterangan
+Nomor antrean / nomor pesanan	Misalnya A012 atau ORD-00012
+Waktu pesanan masuk	Untuk tahu pesanan mana yang lebih lama menunggu
+Sumber pesanan	Offline / online, jika ingin disimulasikan
+Nomor meja / nomor antrean	Bisa diisi dari POS
+Daftar menu	Nama menu yang dipesan
+Jumlah item	Contoh: Chicken Katsu x2
+Catatan khusus	Misalnya “tidak pedas”, “saus dipisah”
+Status pesanan	ordered, processed, atau done
+Durasi tunggu	Selisih waktu dari pesanan masuk sampai sekarang
+
+Aturan tampilannya:
+
+Status	Makna	Tampilan yang disarankan
+ordered	Pesanan baru masuk dan belum dikerjakan	Kartu warna merah / label “Baru”
+processed	Pesanan sedang dimasak/dikemas	Kartu warna kuning / label “Diproses”
+done	Pesanan selesai	Kartu warna hijau / label “Selesai”
+
+Ini juga sesuai dengan kebutuhan antarmuka pada Milestone 3: KDS harus mudah dibaca staf dapur, status dibedakan dengan warna merah untuk ordered, kuning untuk processed, dan hijau untuk done.
+
+F-DN-02 — Detail Pesanan pada KDS
+
+Nama fitur: KDS Order Detail
+Actor utama: Staf Dapur dan Staf Packer
+Jenis akses:
+Staf Dapur = melihat detail.
+Staf Packer = melihat detail dan mengubah status.
+
+Fitur ini digunakan ketika staf ingin melihat isi pesanan dengan lebih jelas. Misalnya di tampilan utama hanya terlihat ringkasan, lalu saat diklik akan muncul detail menu, jumlah, catatan, waktu masuk, dan status.
+
+Spesifikasi detail pesanan:
+
+Komponen	Isi
+Header pesanan	Nomor pesanan, nomor antrean/meja, waktu masuk
+Detail item	Nama menu, jumlah, catatan item
+Status saat ini	Ordered / Processed / Done
+Tombol aksi	Muncul hanya untuk Staf Packer
+Riwayat status	Siapa yang mengubah status dan kapan
+
+Contoh alur:
+
+Staf Dapur membuka layar KDS.
+Staf Dapur memilih salah satu kartu pesanan.
+Sistem menampilkan detail menu dan jumlah.
+Staf Dapur membaca detail sebagai acuan produksi.
+Staf Dapur tidak bisa mengubah status.
+
+Untuk Staf Packer, alurnya sama, tetapi ada tombol Mulai Proses dan Selesaikan Pesanan.
+
+F-DN-03 — Pembaruan Status Pesanan
+
+Nama fitur: Update Status Pesanan
+Actor utama: Staf Packer
+Actor penerima dampak: Staf Dapur dan Staf Kasir
+Jenis akses: Hanya Staf Packer yang boleh update.
+
+Ini adalah fitur inti Danendra. Staf Packer mengubah status pesanan sesuai progres produksi dan pengemasan. Di dokumen use case, alurnya adalah Staf Packer membuka KDS, sistem menampilkan daftar pesanan aktif, lalu Packer mengubah status dari ordered ke processed, kemudian dari processed ke done setelah produksi dan pengemasan selesai.
+
+State transition yang harus dibuat:
+
+Status awal	Aksi Packer	Status akhir
+ordered	Klik Mulai Proses	processed
+processed	Klik Selesai	done
+done	Tidak ada aksi lanjutan	Tetap done
+
+Validasi yang harus ada:
+
+Aturan	Penjelasan
+Tidak boleh lompat dari ordered langsung ke done	Supaya alur produksi tetap tercatat
+Staf Dapur tidak boleh klik update	Karena Staf Dapur hanya view-only
+Pesanan done tidak boleh diedit sembarangan	Untuk menjaga histori produksi
+Setiap perubahan status harus menyimpan waktu	Misalnya processed_at, done_at
+Setiap perubahan status harus menyimpan user	Untuk bukti siapa yang melakukan update
+
+Output fitur:
+
+Status pada kartu KDS berubah.
+Riwayat status tersimpan.
+Tampilan Staf Dapur ikut berubah.
+POS/kasir menerima status bahwa pesanan sudah selesai.
+Data bisa dipakai untuk laporan waktu proses jika diperlukan.
+F-DN-04 — Sinkronisasi Status ke POS/Kasir
+
+Nama fitur: POS Status Synchronization
+Actor utama: Staf Packer sebagai pemicu status
+Actor penerima: Staf Kasir
+Actor view-only: Staf Dapur
+
+Fitur ini memastikan perubahan status di KDS diketahui oleh kasir. Misalnya ketika Packer menekan Selesai, kasir bisa melihat bahwa pesanan siap diserahkan ke pelanggan. Dalam dokumen UC-2, setelah status menjadi done, sistem memberi notifikasi status done yang dapat dilihat oleh Staf Kasir pada POS.
+
+Spesifikasi sinkronisasi:
+
+Kondisi	Respons sistem
+Pesanan baru dibuat di POS	Muncul di KDS dengan status ordered
+Packer klik Mulai Proses	Status berubah menjadi processed di KDS
+Packer klik Selesai	Status berubah menjadi done di KDS dan POS
+Kasir membuka daftar transaksi	Pesanan terlihat sudah selesai
+Koneksi real-time belum stabil	Minimal gunakan auto-refresh berkala
+
+Target performanya: pembaruan status pesanan oleh packer sebaiknya tercermin di POS dalam waktu kurang dari 2 detik sesuai quality requirement Milestone 3.
+
+F-DN-05 — Filter dan Pengurutan Antrean KDS
+
+Nama fitur: Filter & Sorting KDS Queue
+Actor utama: Staf Dapur dan Staf Packer
+Jenis akses: Keduanya bisa menggunakan filter/sort, tetapi hanya Packer yang bisa update status.
+
+Fitur ini membuat layar KDS lebih mudah dipakai saat pesanan ramai. Tanpa filter, layar dapur bisa terlalu penuh dan membingungkan.
+
+Filter yang disarankan:
+
+Filter	Fungsi
+Semua pesanan aktif	Menampilkan ordered dan processed
+Ordered	Menampilkan pesanan yang belum dikerjakan
+Processed	Menampilkan pesanan yang sedang dikerjakan
+Done	Menampilkan pesanan selesai, bisa dibatasi hanya 5–10 menit terakhir
+Offline / Online	Opsional, untuk membedakan sumber pesanan
+Hari ini	Menampilkan pesanan pada tanggal operasional saat ini
+
+Sorting yang disarankan:
+
+Sorting	Fungsi
+Waktu masuk terlama	Pesanan lama muncul dulu
+Status	Ordered dulu, lalu processed
+Nomor antrean	Urut berdasarkan nomor pesanan
+Prioritas	Jika ada pesanan urgent atau komplain
+
+Untuk implementasi minimal, cukup buat filter status dan urut berdasarkan waktu masuk terlama.
+
+F-DN-06 — Riwayat Perubahan Status Pesanan
+
+Nama fitur: Status Update Log
+Actor pembuat log: Staf Packer
+Actor pembaca log: Packer, Kepala Staf, Pemilik
+Actor tidak perlu akses: Staf Dapur biasa, kecuali hanya melihat status akhir.
+
+Fitur ini menyimpan jejak perubahan status. Ini penting karena kalau ada pesanan terlambat, salah, atau diprotes pelanggan, tim bisa mengecek kapan pesanan mulai diproses dan kapan selesai.
+
+Pada DFD Level 2, proses Manajemen Antrean KDS menerima update status dari Staff Packer, menyimpan perubahan ke tabel antrean KDS, dan mencatat log perubahan/riwayat update status.
+
+Data log yang disimpan:
+
+Field	Contoh
+order_id	ORD-00012
+old_status	ordered
+new_status	processed
+updated_by	packer_01
+updated_at	2026-05-14 18:30
+note	Opsional, misalnya “pesanan prioritas”
+
+Minimal output yang harus bisa ditunjukkan saat demo:
+
+Pesanan awalnya ordered.
+Packer mengubah menjadi processed.
+Sistem mencatat waktu perubahan.
+Packer mengubah menjadi done.
+Sistem mencatat waktu selesai.
+F-DN-07 — Hak Akses Khusus KDS
+
+Nama fitur: KDS Role Access
+Actor terkait: Staf Packer, Staf Dapur, Pemilik
+Catatan: Implementasi role utama bisa dikerjakan Boye, tetapi Danendra tetap harus mendefinisikan kebutuhan akses untuk modul KDS.
+
+Matriks hak akses modul Danendra:
+
+Fitur	Staf Dapur	Staf Packer	Kasir	Kepala Staf	Pemilik
+Melihat antrean KDS	Bisa	Bisa	Opsional	Bisa	Bisa
+Melihat detail pesanan	Bisa	Bisa	Opsional	Bisa	Bisa
+Mengubah status ke processed	Tidak	Bisa	Tidak	Opsional/tidak disarankan	Bisa/opsional
+Mengubah status ke done	Tidak	Bisa	Tidak	Opsional/tidak disarankan	Bisa/opsional
+Melihat log status	Tidak/opsional	Bisa	Tidak	Bisa	Bisa
+Menghapus pesanan KDS	Tidak	Tidak	Tidak	Tidak	Pemilik saja, opsional
+
+Rekomendasi paling aman untuk demo: Staf Packer bisa update, Staf Dapur hanya bisa melihat. Ini selaras dengan special requirement UC-2 yang membatasi Packer untuk update status dan Dapur sebagai view-only.

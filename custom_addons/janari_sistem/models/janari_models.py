@@ -78,14 +78,20 @@ class Resep(models.Model):
 class Pesanan(models.Model):
     _name = 'janari.pesanan'
     _description = 'Tabel Pesanan'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='ID Pesanan', required=True, copy=False, readonly=True, default=lambda self: 'New')
     tanggal_pesanan = fields.Datetime(string='Tanggal Pesanan', default=fields.Datetime.now)
+    nomor_meja = fields.Char(string='Nomor Meja / Antrean')
+    sumber_pesanan = fields.Selection([
+        ('offline', 'Offline'),
+        ('online', 'Online')
+    ], string='Sumber Pesanan', default='offline')
     status_pesanan = fields.Selection([
         ('draft', 'Menunggu Pembayaran'),
         ('confirmed', 'Terkonfirmasi'),
         ('done', 'Selesai')
-    ], string='Status Keseluruhan', default='draft')
+    ], string='Status Keseluruhan', default='draft', tracking=True)
     total_harga = fields.Float(string='Total Harga', compute='_compute_total', store=True)
     detail_pesanan_ids = fields.One2many('janari.detail.pesanan', 'pesanan_id', string='Detail Item')
 
@@ -165,21 +171,89 @@ class Pesanan(models.Model):
 class DetailPesanan(models.Model):
     _name = 'janari.detail.pesanan'
     _description = 'Tabel Detail Pesanan'
+    _order = 'pesanan_id asc, id asc'
 
     pesanan_id = fields.Many2one('janari.pesanan', string='Pesanan Reference', required=True, ondelete='cascade')
     menu_id = fields.Many2one('janari.menu', string='Menu', required=True)
     jumlah = fields.Integer(string='Jumlah', default=1, required=True)
+    catatan = fields.Char(string='Catatan Khusus')
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     status_item = fields.Selection([
         ('ordered', 'Ordered'),
         ('processed', 'Processed'),
         ('done', 'Done')
     ], string='Status Dapur (KDS)', default='ordered')
+    processed_at = fields.Datetime(string='Waktu Mulai Proses', readonly=True)
+    done_at = fields.Datetime(string='Waktu Selesai', readonly=True)
+    durasi_tunggu = fields.Integer(
+        string='Durasi Tunggu (menit)',
+        compute='_compute_durasi',
+        store=False,
+    )
+    update_status_ids = fields.One2many('janari.update.status', 'detail_pesanan_id', string='Riwayat Status')
+
+    # Related fields untuk ditampilkan di KDS kanban card
+    nomor_meja = fields.Char(related='pesanan_id.nomor_meja', string='Nomor Meja', store=False, readonly=True)
+    tanggal_pesanan = fields.Datetime(related='pesanan_id.tanggal_pesanan', string='Waktu Pesanan', store=False, readonly=True)
 
     @api.depends('menu_id', 'jumlah')
     def _compute_subtotal(self):
         for record in self:
             record.subtotal = record.menu_id.harga_menu * record.jumlah
+
+    @api.depends('pesanan_id.tanggal_pesanan')
+    def _compute_durasi(self):
+        now = fields.Datetime.now()
+        for record in self:
+            if record.pesanan_id and record.pesanan_id.tanggal_pesanan:
+                delta = now - record.pesanan_id.tanggal_pesanan
+                record.durasi_tunggu = int(delta.total_seconds() / 60)
+            else:
+                record.durasi_tunggu = 0
+
+    def write(self, vals):
+        if 'status_item' in vals:
+            logs = []
+            for record in self:
+                if record.status_item != vals['status_item']:
+                    logs.append({
+                        'detail_pesanan_id': record.id,
+                        'status_before': record.status_item,
+                        'status_after': vals['status_item'],
+                        'updated_by': self.env.user.id,
+                        'updated_at': fields.Datetime.now(),
+                    })
+            result = super().write(vals)
+            for log_vals in logs:
+                self.env['janari.update.status'].create(log_vals)
+            return result
+        return super().write(vals)
+
+    def action_mulai_proses(self):
+        for record in self:
+            if record.status_item != 'ordered':
+                raise UserError('Hanya item dengan status "Ordered" yang bisa diproses.')
+            record.write({
+                'status_item': 'processed',
+                'processed_at': fields.Datetime.now(),
+            })
+
+    def action_selesaikan(self):
+        for record in self:
+            if record.status_item != 'processed':
+                raise UserError('Hanya item dengan status "Processed" yang bisa diselesaikan.')
+            record.write({
+                'status_item': 'done',
+                'done_at': fields.Datetime.now(),
+            })
+            pesanan = record.pesanan_id
+            if all(item.status_item == 'done' for item in pesanan.detail_pesanan_ids):
+                pesanan.status_pesanan = 'done'
+                pesanan.message_post(
+                    body=f'Pesanan <b>{pesanan.name}</b> (Meja {pesanan.nomor_meja or "-"}) sudah selesai dan siap diserahkan ke pelanggan.',
+                    message_type='notification',
+                    subtype_xmlid='mail.mt_comment',
+                )
 
 # D-07 Tabel Transaksi
 class Transaksi(models.Model):
@@ -198,10 +272,14 @@ class Transaksi(models.Model):
 class UpdateStatus(models.Model):
     _name = 'janari.update.status'
     _description = 'Tabel Riwayat Perubahan Status KDS'
+    _order = 'updated_at desc'
 
-    detail_pesanan_id = fields.Many2one('janari.detail.pesanan', string='Item Pesanan', required=True)
+    detail_pesanan_id = fields.Many2one('janari.detail.pesanan', string='Item Pesanan', required=True, ondelete='cascade')
     status_before = fields.Char(string='Status Sebelum')
     status_after = fields.Char(string='Status Sesudah')
+    updated_by = fields.Many2one('res.users', string='Diubah Oleh', default=lambda self: self.env.user)
+    updated_at = fields.Datetime(string='Waktu Perubahan', default=fields.Datetime.now)
+    note = fields.Char(string='Catatan')
 
 class JanariUser(models.Model):
     _inherit = 'res.users'
@@ -213,3 +291,36 @@ class JanariUser(models.Model):
         ('kepala_staf', 'Kepala Staf'),
         ('pemilik', 'Pemilik')
     ], string='Role Sistem Janari')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        users = super(JanariUser, self).create(vals_list)
+        for user in users:
+            user._update_janari_groups()
+        return users
+
+    def write(self, vals):
+        res = super(JanariUser, self).write(vals)
+        if 'janari_role' in vals:
+            self._update_janari_groups()
+        return res
+
+    def _update_janari_groups(self):
+        for user in self:
+            group_map = {
+                'kasir': 'janari_sistem.group_janari_kasir',
+                'packer': 'janari_sistem.group_janari_packer',
+                'dapur': 'janari_sistem.group_janari_dapur',
+                'kepala_staf': 'janari_sistem.group_janari_kepala_staf',
+                'pemilik': 'janari_sistem.group_janari_pemilik',
+            }
+
+            # hapus semua grup Janari agar tidak double role
+            all_janari_groups = [self.env.ref(xml_id).id for xml_id in group_map.values() if self.env.ref(xml_id, raise_if_not_found=False)]
+            user.write({'groups_id': [(3, gid) for gid in all_janari_groups]})
+
+            if user.janari_role and user.janari_role in group_map:
+                group_xml_id = group_map[user.janari_role]
+                group = self.env.ref(group_xml_id, raise_if_not_found=False)
+                if group:
+                    user.write({'groups_id': [(4, group.id)]})

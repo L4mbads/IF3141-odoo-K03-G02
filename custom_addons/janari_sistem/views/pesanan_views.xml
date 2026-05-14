@@ -27,18 +27,30 @@
                         <h1><field name="name"/></h1>
                     </div>
                     <group>
-                        <field name="tanggal_pesanan"/>
-                        <field name="total_harga" readonly="1"/>
+                        <group>
+                            <field name="tanggal_pesanan"/>
+                            <field name="nomor_meja"/>
+                        </group>
+                        <group>
+                            <field name="sumber_pesanan"/>
+                            <field name="total_harga" readonly="1"/>
+                        </group>
                     </group>
                     <field name="detail_pesanan_ids">
                         <tree editable="bottom">
                             <field name="menu_id"/>
                             <field name="jumlah"/>
+                            <field name="catatan"/>
                             <field name="subtotal" readonly="1"/>
                             <field name="status_item" readonly="1"/>
                         </tree>
                     </field>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -49,5 +61,5 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_janari_pos_order" name="Pesanan Baru" parent="menu_janari_pos" action="action_janari_pesanan" sequence="10"/>
+    <menuitem id="menu_janari_pos_order" name="Pesanan Baru" parent="menu_janari_pos" action="action_janari_pesanan" sequence="10" groups="janari_sistem.group_janari_kasir"/>
 </odoo>
