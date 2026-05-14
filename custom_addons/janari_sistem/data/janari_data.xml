@@ -30,7 +30,7 @@
         </record>
 
         <!-- ===================== BAHAN BAKU (3) ===================== -->
-    
+
         <record id="bahan_baku_kopi_arabica" model="janari.bahan.baku">
             <field name="name">Biji Kopi Arabica</field>
             <field name="jenis">Bahan Utama</field>
@@ -84,36 +84,42 @@
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
             <field name="jumlah_bahan">18</field>
+            <field name="satuan" ref="satuan_gram"/>
         </record>
 
         <record id="resep_kopsus_susu" model="janari.resep">
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
             <field name="jumlah_bahan">150</field>
+            <field name="satuan" ref="satuan_ml"/>
         </record>
 
         <record id="resep_kopsus_gula" model="janari.resep">
             <field name="menu_id" ref="menu_kopi_susu_janari"/>
             <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
             <field name="jumlah_bahan">20</field>
+            <field name="satuan" ref="satuan_gram"/>
         </record>
 
         <record id="resep_americano_kopi" model="janari.resep">
             <field name="menu_id" ref="menu_americano"/>
             <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
             <field name="jumlah_bahan">20</field>
+            <field name="satuan" ref="satuan_gram"/>
         </record>
 
         <record id="resep_matcha_susu" model="janari.resep">
             <field name="menu_id" ref="menu_matcha_latte"/>
             <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
             <field name="jumlah_bahan">200</field>
+            <field name="satuan" ref="satuan_ml"/>
         </record>
 
         <record id="resep_matcha_gula" model="janari.resep">
             <field name="menu_id" ref="menu_matcha_latte"/>
             <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
             <field name="jumlah_bahan">15</field>
+            <field name="satuan" ref="satuan_gram"/>
         </record>
 
         <!-- ===================== PESANAN (3) ===================== -->
@@ -200,7 +206,7 @@
             <field name="updated_by" ref="base.user_admin"/>
             <field name="updated_at">2026-05-14 09:30:00</field>
         </record>
-        
+
         <!-- User Dummy -->
         <record id="user_kasir_dummy" model="res.users">
             <field name="name">Andi Kasir</field>
