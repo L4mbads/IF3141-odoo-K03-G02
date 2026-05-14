@@ -87,6 +87,18 @@ class Pesanan(models.Model):
                         resep.bahan_baku_id.stok_saat_ini -= resep.jumlah_bahan * item.jumlah
                 record.status_pesanan = 'confirmed'
 
+                low_stock_bahan = record.detail_pesanan_ids.mapped('menu_id.resep_ids.bahan_baku_id').filtered(lambda b: b.is_low_stock)
+                if low_stock_bahan:
+                    nama_bahan = ', '.join(low_stock_bahan.mapped('name'))
+                    self.env['bus.bus']._sendone(
+                        'janari_low_stock',
+                        'janari_low_stock_alert',
+                        {
+                            'title': 'Peringatan Stok Rendah',
+                            'message': f'Stok berikut di bawah reorder point: {nama_bahan}',
+                        }
+                    )
+
 # D-06 Tabel Detail Pesanan
 class DetailPesanan(models.Model):
     _name = 'janari.detail.pesanan'
