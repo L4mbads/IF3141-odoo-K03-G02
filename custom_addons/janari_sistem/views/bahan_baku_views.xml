@@ -3,12 +3,14 @@
     <record id="view_janari_bahan_baku_tree" model="ir.ui.view">
         <field name="name">janari.bahan.baku.tree</field>
         <field name="model">janari.bahan.baku</field>
+        <field name="priority">8</field>
         <field name="arch" type="xml">
-            <tree string="Bahan Baku">
+            <tree string="Bahan Baku" decoration-danger="is_low_stock == True">
                 <field name="name"/>
                 <field name="jenis"/>
                 <field name="stok_saat_ini"/>
                 <field name="reorder_point"/>
+                <field name="is_low_stock" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -18,6 +20,9 @@
         <field name="model">janari.bahan.baku</field>
         <field name="arch" type="xml">
             <form string="Bahan Baku">
+                <header>
+                    <button name="action_new_bahan_baku" string="Tambah Bahan Baru" type="object" class="btn-secondary"/>
+                </header>
                 <sheet>
                     <group>
                         <group>
@@ -41,6 +46,7 @@
         <field name="name">Data Bahan Baku</field>
         <field name="res_model">janari.bahan.baku</field>
         <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_janari_bahan_baku_tree"/>
     </record>
 
     <menuitem id="menu_bahan_baku" name="Bahan Baku" parent="menu_janari_inventory" action="action_janari_bahan_baku" sequence="10"/>

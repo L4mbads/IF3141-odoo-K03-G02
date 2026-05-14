@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 # D-01 Tabel Bahan Baku
 class BahanBaku(models.Model):
@@ -10,9 +11,17 @@ class BahanBaku(models.Model):
     satuan = fields.Char(string='Satuan')
     harga = fields.Float(string='Harga')
     vendor = fields.Char(string='Vendor')
-    stok_saat_ini = fields.Integer(string='Stok Saat Ini', default=0)
-    reorder_point = fields.Integer(string='Reorder Point', default=10)
+    stok_saat_ini = fields.Float(string='Stok Saat Ini', default=0)
+    reorder_point = fields.Float(string='Reorder Point', default=10)
     is_low_stock = fields.Boolean(string="Status Stok Rendah", compute="_compute_low_stock", store=True)
+
+    def action_new_bahan_baku(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'janari.bahan.baku',
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
     @api.depends('stok_saat_ini', 'reorder_point')
     def _compute_low_stock(self):
@@ -64,6 +73,18 @@ class Pesanan(models.Model):
     def action_confirm(self):
         for record in self:
             if record.status_pesanan == 'draft':
+                for item in record.detail_pesanan_ids:
+                    for resep in item.menu_id.resep_ids:
+                        kebutuhan = resep.jumlah_bahan * item.jumlah
+                        if resep.bahan_baku_id.stok_saat_ini < kebutuhan:
+                            raise UserError(
+                                f"Stok '{resep.bahan_baku_id.name}' tidak cukup! "
+                                f"Dibutuhkan: {kebutuhan} {resep.bahan_baku_id.satuan}, "
+                                f"Tersedia: {resep.bahan_baku_id.stok_saat_ini}"
+                            )
+                for item in record.detail_pesanan_ids:
+                    for resep in item.menu_id.resep_ids:
+                        resep.bahan_baku_id.stok_saat_ini -= resep.jumlah_bahan * item.jumlah
                 record.status_pesanan = 'confirmed'
 
 # D-06 Tabel Detail Pesanan
