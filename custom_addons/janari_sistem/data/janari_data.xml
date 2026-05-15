@@ -226,23 +226,23 @@
         <!-- ===================== USERS (5) ===================== -->
         <record id="user_kasir_dummy" model="res.users">
             <field name="name">Andi Kasir</field><field name="login">kasir</field><field name="password">kasir123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_kasir')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_kasir')])]"/>
         </record>
         <record id="user_packer_dummy" model="res.users">
             <field name="name">Budi Packer</field><field name="login">packer</field><field name="password">packer123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_packer')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_packer')])]"/>
         </record>
         <record id="user_dapur_dummy" model="res.users">
             <field name="name">Doni Dapur</field><field name="login">dapur</field><field name="password">dapur123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_dapur')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_dapur')])]"/>
         </record>
         <record id="user_kepala_dummy" model="res.users">
             <field name="name">Sari Kepala Staf</field><field name="login">kepala</field><field name="password">kepala123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_kepala_staf')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_kepala_staf')])]"/>
         </record>
         <record id="user_pemilik_dummy" model="res.users">
             <field name="name">Bapak Pemilik</field><field name="login">pemilik</field><field name="password">pemilik123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_pemilik')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_pemilik')])]"/>
         </record>
     </data>
 </odoo>
