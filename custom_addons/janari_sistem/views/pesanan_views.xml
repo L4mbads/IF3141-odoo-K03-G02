@@ -80,6 +80,10 @@
                         <group string="Detail Transaksi">
                             <field name="sumber_pesanan"
                                    readonly="status_pesanan != 'draft'"/>
+                            <field name="metode_pembayaran"
+                                   readonly="status_pesanan != 'draft'"
+                                   widget="radio"
+                                   options="{'horizontal': true}"/>
                         </group>
                         <group>
                             <field name="total_harga" readonly="1"/>
