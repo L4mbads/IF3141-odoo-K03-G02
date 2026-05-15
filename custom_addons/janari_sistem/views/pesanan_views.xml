@@ -1,51 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ===================== TREE VIEW ===================== -->
     <record id="view_janari_pesanan_tree" model="ir.ui.view">
         <field name="name">janari.pesanan.tree</field>
         <field name="model">janari.pesanan</field>
         <field name="arch" type="xml">
-            <tree string="Pesanan">
-                <field name="name"/>
-                <field name="tanggal_pesanan"/>
-                <field name="total_harga"/>
-                <field name="status_pesanan" widget="badge" decoration-info="status_pesanan == 'draft'" decoration-success="status_pesanan == 'done'"/>
+            <tree string="Daftar Pesanan"
+                  decoration-muted="status_pesanan == 'done'"
+                  decoration-warning="status_pesanan == 'confirmed'"
+                  decoration-info="status_pesanan == 'draft'">
+                <field name="name" string="No. Pesanan"/>
+                <field name="tanggal_pesanan" string="Waktu"/>
+                <field name="nomor_meja" string="Meja / Antrean"/>
+                <field name="nama_pemesan" string="Nama Pemesan"/>
+                <field name="sumber_pesanan" widget="badge"/>
+                <field name="ringkasan_item" string="Item yang Dipesan"/>
+                <field name="total_harga" sum="Total Keseluruhan"/>
+                <field name="status_pesanan" widget="badge"
+                       decoration-info="status_pesanan == 'draft'"
+                       decoration-warning="status_pesanan == 'confirmed'"
+                       decoration-success="status_pesanan == 'done'"/>
             </tree>
         </field>
     </record>
 
+    <!-- ===================== FORM VIEW ===================== -->
     <record id="view_janari_pesanan_form" model="ir.ui.view">
         <field name="name">janari.pesanan.form</field>
         <field name="model">janari.pesanan</field>
         <field name="arch" type="xml">
             <form string="Input Pesanan">
                 <header>
-                    <button name="action_confirm" string="Konfirmasi Pembayaran" type="object" class="btn-primary" invisible="status_pesanan != 'draft'"/>
-                    <field name="status_pesanan" widget="statusbar"/>
+                    <button name="action_confirm"
+                            string="✔ Konfirmasi Pembayaran"
+                            type="object"
+                            class="btn-primary"
+                            invisible="status_pesanan != 'draft'"/>
+                    <field name="status_pesanan" widget="statusbar"
+                           statusbar_visible="draft,confirmed,done"/>
                 </header>
                 <sheet>
+                    <!-- Banner peringatan stok tidak cukup -->
+                    <div class="alert alert-danger d-flex align-items-center"
+                         invisible="not warning_stok" role="alert">
+                        <i class="fa fa-exclamation-triangle me-2"/>
+                        <div>
+                            <strong>Stok Tidak Cukup!</strong><br/>
+                            <field name="warning_stok" readonly="1" nolabel="1"/>
+                        </div>
+                    </div>
+
+                    <!-- Banner pesanan sudah dikunci -->
+                    <div class="alert alert-info"
+                         invisible="status_pesanan == 'draft'" role="alert">
+                        <i class="fa fa-lock me-2"/>
+                        <strong>Pesanan ini sudah terkonfirmasi dan tidak dapat diubah.</strong>
+                    </div>
+
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
                     </div>
+
+                    <!-- Form fields: readonly setelah confirmed/done -->
                     <group>
-                        <group>
-                            <field name="tanggal_pesanan"/>
-                            <field name="nomor_meja"/>
+                        <group string="Informasi Pesanan">
+                            <field name="tanggal_pesanan"
+                                   readonly="status_pesanan != 'draft'"/>
+                            <field name="nomor_meja"
+                                   readonly="status_pesanan != 'draft'"/>
+                        </group>
+                        <group string="Data Pemesan">
+                            <field name="nama_pemesan"
+                                   readonly="status_pesanan != 'draft'"/>
+                            <field name="no_hp_pemesan"
+                                   readonly="status_pesanan != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Detail Transaksi">
+                            <field name="sumber_pesanan"
+                                   readonly="status_pesanan != 'draft'"/>
+                            <field name="metode_pembayaran"
+                                   readonly="status_pesanan != 'draft'"
+                                   widget="radio"
+                                   options="{'horizontal': true}"/>
                         </group>
                         <group>
-                            <field name="sumber_pesanan"/>
                             <field name="total_harga" readonly="1"/>
                         </group>
                     </group>
-                    <field name="detail_pesanan_ids">
-                        <tree editable="bottom">
-                            <field name="menu_id"/>
-                            <field name="jumlah"/>
-                            <field name="catatan"/>
-                            <field name="subtotal" readonly="1"/>
-                            <field name="status_item" readonly="1"/>
-                        </tree>
-                    </field>
+
+                    <notebook>
+                        <!-- Tab 1: Item Pesanan -->
+                        <page string="Item Pesanan" name="items">
+                            <field name="detail_pesanan_ids"
+                                   readonly="status_pesanan != 'draft'">
+                                <tree editable="bottom"
+                                      decoration-info="status_item == 'ordered'"
+                                      decoration-warning="status_item == 'processed'"
+                                      decoration-success="status_item == 'done'"
+                                      delete="status_pesanan == 'draft'">
+                                    <field name="menu_id"/>
+                                    <field name="jumlah"/>
+                                    <field name="catatan"/>
+                                    <field name="subtotal" readonly="1"/>
+                                    <field name="status_item" readonly="1" widget="badge"
+                                           decoration-info="status_item == 'ordered'"
+                                           decoration-warning="status_item == 'processed'"
+                                           decoration-success="status_item == 'done'"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <!-- Tab 2: Riwayat Pembayaran (gabung dari transaksi) -->
+                        <page string="Riwayat Pembayaran" name="pembayaran"
+                              invisible="status_pesanan == 'draft'">
+                            <field name="transaksi_ids">
+                                <tree create="1" editable="bottom">
+                                    <field name="waktu_transaksi" readonly="1"/>
+                                    <field name="metode_pembayaran"/>
+                                    <field name="total_bayar"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <field name="total_harga" string="Total yang Harus Dibayar" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
+
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
@@ -55,11 +138,45 @@
         </field>
     </record>
 
-    <record id="action_janari_pesanan" model="ir.actions.act_window">
-        <field name="name">Input Transaksi POS</field>
-        <field name="res_model">janari.pesanan</field>
-        <field name="view_mode">tree,form</field>
+    <!-- ===================== SEARCH VIEW ===================== -->
+    <record id="view_janari_pesanan_search" model="ir.ui.view">
+        <field name="name">janari.pesanan.search</field>
+        <field name="model">janari.pesanan</field>
+        <field name="arch" type="xml">
+            <search string="Cari Pesanan">
+                <field name="name" string="No. Pesanan"/>
+                <field name="nomor_meja" string="Meja / Antrean"/>
+                <separator/>
+                <filter name="filter_draft" string="Menunggu Pembayaran" domain="[('status_pesanan', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="Sudah Dibayar" domain="[('status_pesanan', '=', 'confirmed')]"/>
+                <filter name="filter_done" string="Selesai" domain="[('status_pesanan', '=', 'done')]"/>
+                <separator/>
+                <filter name="filter_today" string="Hari Ini"
+                        domain="[('tanggal', '=', context_today())]"/>
+                <group expand="0" string="Kelompokkan Berdasarkan">
+                    <filter name="group_status" string="Status" context="{'group_by': 'status_pesanan'}"/>
+                    <filter name="group_date" string="Tanggal" context="{'group_by': 'tanggal_pesanan:day'}"/>
+                    <filter name="group_sumber" string="Sumber" context="{'group_by': 'sumber_pesanan'}"/>
+                </group>
+            </search>
+        </field>
     </record>
 
-    <menuitem id="menu_janari_pos_order" name="Pesanan Baru" parent="menu_janari_pos" action="action_janari_pesanan" sequence="10" groups="janari_sistem.group_janari_kasir"/>
+    <!-- ===================== ACTION ===================== -->
+    <record id="action_janari_pesanan" model="ir.actions.act_window">
+        <field name="name">Pesanan &amp; Transaksi</field>
+        <field name="res_model">janari.pesanan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_janari_pesanan_search"/>
+        <field name="context">{'search_default_filter_today': 1}</field>
+    </record>
+
+    <!-- ===================== MENU ===================== -->
+    <!-- Satu menu "Pesanan" yang menggabungkan input + riwayat transaksi -->
+    <menuitem id="menu_janari_pos_order"
+              name="Pesanan"
+              parent="menu_janari_pos"
+              action="action_janari_pesanan"
+              sequence="10"
+              groups="janari_sistem.group_janari_kasir"/>
 </odoo>

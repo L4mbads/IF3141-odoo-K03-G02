@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===================== TRANSAKSI - LIST VIEW ===================== -->
+    <record id="view_janari_transaksi_tree" model="ir.ui.view">
+        <field name="name">janari.transaksi.tree</field>
+        <field name="model">janari.transaksi</field>
+        <field name="arch" type="xml">
+            <tree string="Riwayat Transaksi"
+                  decoration-success="metode_pembayaran == 'qris'"
+                  decoration-info="metode_pembayaran == 'cash'">
+                <field name="pesanan_id"/>
+                <field name="waktu_transaksi"/>
+                <field name="metode_pembayaran" widget="badge"
+                       decoration-success="metode_pembayaran == 'qris'"
+                       decoration-info="metode_pembayaran == 'cash'"/>
+                <field name="total_bayar" sum="Total Pendapatan"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ===================== TRANSAKSI - FORM VIEW ===================== -->
+    <record id="view_janari_transaksi_form" model="ir.ui.view">
+        <field name="name">janari.transaksi.form</field>
+        <field name="model">janari.transaksi</field>
+        <field name="arch" type="xml">
+            <form string="Proses Pembayaran">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="pesanan_id" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Detail Pembayaran">
+                            <field name="metode_pembayaran"/>
+                            <field name="total_bayar"/>
+                        </group>
+                        <group string="Waktu">
+                            <field name="waktu_transaksi"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================== ACTION ===================== -->
+    <record id="action_janari_transaksi" model="ir.actions.act_window">
+        <field name="name">Riwayat Transaksi</field>
+        <field name="res_model">janari.transaksi</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- NOTE: Menu Riwayat Transaksi telah digabungkan ke dalam tab "Riwayat Pembayaran"
+         di halaman form Pesanan. Kasir tidak perlu membuka page terpisah. -->
+</odoo>

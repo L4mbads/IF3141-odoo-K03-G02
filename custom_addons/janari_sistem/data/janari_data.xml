@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- ===================== SEQUENCE ===================== -->
+        <record id="seq_janari_pesanan" model="ir.sequence">
+            <field name="name">Nomor Pesanan Janari</field>
+            <field name="code">janari.pesanan</field>
+            <field name="prefix">ORD-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
         <record id="satuan_gram" model="janari.satuan">
             <field name="name">Gram</field><field name="category">berat</field><field name="factor">1</field>
         </record>
@@ -29,204 +39,212 @@
             <field name="name">Sachet</field><field name="category">jumlah</field><field name="factor">1</field>
         </record>
 
-        <!-- ===================== BAHAN BAKU (3) ===================== -->
+        <!-- ===================== BAHAN BAKU (14) ===================== -->
 
         <record id="bahan_baku_kopi_arabica" model="janari.bahan.baku">
-            <field name="name">Biji Kopi Arabica</field>
-            <field name="jenis">Bahan Utama</field>
-            <field name="satuan" ref="satuan_gram"/>
-            <field name="harga">250</field>
+            <field name="name">Biji Kopi Arabica</field><field name="jenis">Kopi</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">250</field>
             <field name="vendor">Roastery Lokal Bandung</field>
-            <field name="stok_saat_ini">5000</field>
-            <field name="reorder_point">1000</field>
+            <field name="stok_saat_ini">5000</field><field name="reorder_point">1000</field>
         </record>
-
+        <record id="bahan_baku_kopi_robusta" model="janari.bahan.baku">
+            <field name="name">Biji Kopi Robusta</field><field name="jenis">Kopi</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">180</field>
+            <field name="vendor">Petani Kopi Lampung</field>
+            <field name="stok_saat_ini">4000</field><field name="reorder_point">800</field>
+        </record>
         <record id="bahan_baku_susu_uht" model="janari.bahan.baku">
-            <field name="name">Susu UHT Full Cream</field>
-            <field name="jenis">Bahan Pendukung</field>
-            <field name="satuan" ref="satuan_ml"/>
-            <field name="harga">15</field>
-            <field name="vendor">Distributor Susu</field>
-            <field name="stok_saat_ini">10000</field>
-            <field name="reorder_point">2000</field>
+            <field name="name">Susu UHT Full Cream</field><field name="jenis">Susu</field>
+            <field name="satuan" ref="satuan_ml"/><field name="harga">15</field>
+            <field name="vendor">Distributor Dairy Sejahtera</field>
+            <field name="stok_saat_ini">10000</field><field name="reorder_point">2000</field>
         </record>
-
+        <record id="bahan_baku_susu_oat" model="janari.bahan.baku">
+            <field name="name">Susu Oat</field><field name="jenis">Susu</field>
+            <field name="satuan" ref="satuan_ml"/><field name="harga">22</field>
+            <field name="vendor">Importir Oat Milk</field>
+            <field name="stok_saat_ini">3000</field><field name="reorder_point">600</field>
+        </record>
         <record id="bahan_baku_gula_aren" model="janari.bahan.baku">
-            <field name="name">Sirup Gula Aren</field>
-            <field name="jenis">Bahan Pendukung</field>
-            <field name="satuan" ref="satuan_ml"/>
-            <field name="harga">20</field>
-            <field name="stok_saat_ini">2000</field>
-            <field name="reorder_point">500</field>
+            <field name="name">Sirup Gula Aren</field><field name="jenis">Pemanis</field>
+            <field name="satuan" ref="satuan_ml"/><field name="harga">20</field>
+            <field name="vendor">UD Gula Nusantara</field>
+            <field name="stok_saat_ini">2000</field><field name="reorder_point">500</field>
+        </record>
+        <record id="bahan_baku_sirup_vanilla" model="janari.bahan.baku">
+            <field name="name">Sirup Vanilla</field><field name="jenis">Pemanis</field>
+            <field name="satuan" ref="satuan_ml"/><field name="harga">25</field>
+            <field name="vendor">Monin Distributor</field>
+            <field name="stok_saat_ini">1500</field><field name="reorder_point">400</field>
+        </record>
+        <record id="bahan_baku_gula_pasir" model="janari.bahan.baku">
+            <field name="name">Gula Pasir</field><field name="jenis">Pemanis</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">12</field>
+            <field name="vendor">Toko Sembako Pak Budi</field>
+            <field name="stok_saat_ini">3000</field><field name="reorder_point">500</field>
+        </record>
+        <record id="bahan_baku_matcha" model="janari.bahan.baku">
+            <field name="name">Bubuk Matcha Premium</field><field name="jenis">Bubuk</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">350</field>
+            <field name="vendor">Importir Matcha Jepang</field>
+            <field name="stok_saat_ini">800</field><field name="reorder_point">200</field>
+        </record>
+        <record id="bahan_baku_cokelat" model="janari.bahan.baku">
+            <field name="name">Bubuk Cokelat Dark</field><field name="jenis">Bubuk</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">120</field>
+            <field name="vendor">Cacao Supplier Indonesia</field>
+            <field name="stok_saat_ini">1200</field><field name="reorder_point">300</field>
+        </record>
+        <record id="bahan_baku_teh_earl_grey" model="janari.bahan.baku">
+            <field name="name">Teh Earl Grey</field><field name="jenis">Teh</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">80</field>
+            <field name="vendor">Toko Teh Nusantara</field>
+            <field name="stok_saat_ini">600</field><field name="reorder_point">150</field>
+        </record>
+        <record id="bahan_baku_es_batu" model="janari.bahan.baku">
+            <field name="name">Es Batu</field><field name="jenis">Pelengkap</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">2</field>
+            <field name="vendor">Pabrik Es CV Sejuk</field>
+            <field name="stok_saat_ini">20000</field><field name="reorder_point">3000</field>
+        </record>
+        <record id="bahan_baku_tepung" model="janari.bahan.baku">
+            <field name="name">Tepung Terigu</field><field name="jenis">Bahan Makanan</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">10</field>
+            <field name="vendor">Distributor Bogasari</field>
+            <field name="stok_saat_ini">5000</field><field name="reorder_point">1000</field>
+        </record>
+        <record id="bahan_baku_telur" model="janari.bahan.baku">
+            <field name="name">Telur Ayam</field><field name="jenis">Bahan Makanan</field>
+            <field name="satuan" ref="satuan_buah"/><field name="harga">2500</field>
+            <field name="vendor">Peternak Ayam Pak Hendra</field>
+            <field name="stok_saat_ini">120</field><field name="reorder_point">30</field>
+        </record>
+        <record id="bahan_baku_mentega" model="janari.bahan.baku">
+            <field name="name">Mentega</field><field name="jenis">Bahan Makanan</field>
+            <field name="satuan" ref="satuan_gram"/><field name="harga">50</field>
+            <field name="vendor">Distributor Dairy</field>
+            <field name="stok_saat_ini">2000</field><field name="reorder_point">400</field>
         </record>
 
-        <!-- ===================== MENU (3) ===================== -->
-        <record id="menu_kopi_susu_janari" model="janari.menu">
-            <field name="name">Es Kopi Susu Janari</field>
-            <field name="harga_menu">25000</field>
-            <field name="status_menu">tersedia</field>
-        </record>
+        <!-- ===================== MENU (10) ===================== -->
+        <record id="menu_kopi_susu_janari" model="janari.menu"><field name="name">Es Kopi Susu Janari</field><field name="harga_menu">25000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_americano" model="janari.menu"><field name="name">Iced Americano</field><field name="harga_menu">20000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_matcha_latte" model="janari.menu"><field name="name">Matcha Latte</field><field name="harga_menu">28000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_robusta_tubruk" model="janari.menu"><field name="name">Kopi Robusta Tubruk</field><field name="harga_menu">15000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_vanilla_latte" model="janari.menu"><field name="name">Vanilla Latte</field><field name="harga_menu">27000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_dark_choco" model="janari.menu"><field name="name">Dark Chocolate</field><field name="harga_menu">26000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_earl_grey_latte" model="janari.menu"><field name="name">Earl Grey Latte</field><field name="harga_menu">22000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_oat_latte" model="janari.menu"><field name="name">Oat Milk Latte</field><field name="harga_menu">30000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_roti_bakar" model="janari.menu"><field name="name">Roti Bakar Selai</field><field name="harga_menu">18000</field><field name="status_menu">tersedia</field></record>
+        <record id="menu_telur_orak" model="janari.menu"><field name="name">Telur Orak-Arik</field><field name="harga_menu">25000</field><field name="status_menu">tersedia</field></record>
 
-        <record id="menu_americano" model="janari.menu">
-            <field name="name">Iced Americano</field>
-            <field name="harga_menu">20000</field>
-            <field name="status_menu">tersedia</field>
-        </record>
+        <!-- ===================== RESEP / BOM (28) ===================== -->
+        <!-- Es Kopi Susu Janari -->
+        <record id="resep_kopsus_kopi" model="janari.resep"><field name="menu_id" ref="menu_kopi_susu_janari"/><field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/><field name="jumlah_bahan">18</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_kopsus_susu" model="janari.resep"><field name="menu_id" ref="menu_kopi_susu_janari"/><field name="bahan_baku_id" ref="bahan_baku_susu_uht"/><field name="jumlah_bahan">150</field><field name="satuan" ref="satuan_ml"/></record>
+        <record id="resep_kopsus_gula" model="janari.resep"><field name="menu_id" ref="menu_kopi_susu_janari"/><field name="bahan_baku_id" ref="bahan_baku_gula_aren"/><field name="jumlah_bahan">20</field><field name="satuan" ref="satuan_ml"/></record>
+        <record id="resep_kopsus_es" model="janari.resep"><field name="menu_id" ref="menu_kopi_susu_janari"/><field name="bahan_baku_id" ref="bahan_baku_es_batu"/><field name="jumlah_bahan">150</field><field name="satuan" ref="satuan_gram"/></record>
+        <!-- Iced Americano -->
+        <record id="resep_americano_kopi" model="janari.resep"><field name="menu_id" ref="menu_americano"/><field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/><field name="jumlah_bahan">20</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_americano_es" model="janari.resep"><field name="menu_id" ref="menu_americano"/><field name="bahan_baku_id" ref="bahan_baku_es_batu"/><field name="jumlah_bahan">200</field><field name="satuan" ref="satuan_gram"/></record>
+        <!-- Matcha Latte -->
+        <record id="resep_matcha_bubuk" model="janari.resep"><field name="menu_id" ref="menu_matcha_latte"/><field name="bahan_baku_id" ref="bahan_baku_matcha"/><field name="jumlah_bahan">8</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_matcha_susu" model="janari.resep"><field name="menu_id" ref="menu_matcha_latte"/><field name="bahan_baku_id" ref="bahan_baku_susu_uht"/><field name="jumlah_bahan">200</field><field name="satuan" ref="satuan_ml"/></record>
+        <record id="resep_matcha_gula" model="janari.resep"><field name="menu_id" ref="menu_matcha_latte"/><field name="bahan_baku_id" ref="bahan_baku_gula_aren"/><field name="jumlah_bahan">15</field><field name="satuan" ref="satuan_ml"/></record>
+        <!-- Kopi Robusta Tubruk -->
+        <record id="resep_robusta_kopi" model="janari.resep"><field name="menu_id" ref="menu_robusta_tubruk"/><field name="bahan_baku_id" ref="bahan_baku_kopi_robusta"/><field name="jumlah_bahan">25</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_robusta_gula" model="janari.resep"><field name="menu_id" ref="menu_robusta_tubruk"/><field name="bahan_baku_id" ref="bahan_baku_gula_pasir"/><field name="jumlah_bahan">10</field><field name="satuan" ref="satuan_gram"/></record>
+        <!-- Vanilla Latte -->
+        <record id="resep_vanilla_kopi" model="janari.resep"><field name="menu_id" ref="menu_vanilla_latte"/><field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/><field name="jumlah_bahan">18</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_vanilla_susu" model="janari.resep"><field name="menu_id" ref="menu_vanilla_latte"/><field name="bahan_baku_id" ref="bahan_baku_susu_uht"/><field name="jumlah_bahan">150</field><field name="satuan" ref="satuan_ml"/></record>
+        <record id="resep_vanilla_syrup" model="janari.resep"><field name="menu_id" ref="menu_vanilla_latte"/><field name="bahan_baku_id" ref="bahan_baku_sirup_vanilla"/><field name="jumlah_bahan">30</field><field name="satuan" ref="satuan_ml"/></record>
+        <!-- Dark Chocolate -->
+        <record id="resep_choco_bubuk" model="janari.resep"><field name="menu_id" ref="menu_dark_choco"/><field name="bahan_baku_id" ref="bahan_baku_cokelat"/><field name="jumlah_bahan">15</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_choco_susu" model="janari.resep"><field name="menu_id" ref="menu_dark_choco"/><field name="bahan_baku_id" ref="bahan_baku_susu_uht"/><field name="jumlah_bahan">200</field><field name="satuan" ref="satuan_ml"/></record>
+        <record id="resep_choco_gula" model="janari.resep"><field name="menu_id" ref="menu_dark_choco"/><field name="bahan_baku_id" ref="bahan_baku_gula_pasir"/><field name="jumlah_bahan">15</field><field name="satuan" ref="satuan_gram"/></record>
+        <!-- Earl Grey Latte -->
+        <record id="resep_earlgrey_teh" model="janari.resep"><field name="menu_id" ref="menu_earl_grey_latte"/><field name="bahan_baku_id" ref="bahan_baku_teh_earl_grey"/><field name="jumlah_bahan">5</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_earlgrey_susu" model="janari.resep"><field name="menu_id" ref="menu_earl_grey_latte"/><field name="bahan_baku_id" ref="bahan_baku_susu_uht"/><field name="jumlah_bahan">150</field><field name="satuan" ref="satuan_ml"/></record>
+        <record id="resep_earlgrey_gula" model="janari.resep"><field name="menu_id" ref="menu_earl_grey_latte"/><field name="bahan_baku_id" ref="bahan_baku_gula_pasir"/><field name="jumlah_bahan">10</field><field name="satuan" ref="satuan_gram"/></record>
+        <!-- Oat Milk Latte -->
+        <record id="resep_oat_kopi" model="janari.resep"><field name="menu_id" ref="menu_oat_latte"/><field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/><field name="jumlah_bahan">18</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_oat_susu" model="janari.resep"><field name="menu_id" ref="menu_oat_latte"/><field name="bahan_baku_id" ref="bahan_baku_susu_oat"/><field name="jumlah_bahan">200</field><field name="satuan" ref="satuan_ml"/></record>
+        <!-- Roti Bakar Selai -->
+        <record id="resep_roti_tepung" model="janari.resep"><field name="menu_id" ref="menu_roti_bakar"/><field name="bahan_baku_id" ref="bahan_baku_tepung"/><field name="jumlah_bahan">80</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_roti_mentega" model="janari.resep"><field name="menu_id" ref="menu_roti_bakar"/><field name="bahan_baku_id" ref="bahan_baku_mentega"/><field name="jumlah_bahan">20</field><field name="satuan" ref="satuan_gram"/></record>
+        <!-- Telur Orak-Arik -->
+        <record id="resep_telur_telur" model="janari.resep"><field name="menu_id" ref="menu_telur_orak"/><field name="bahan_baku_id" ref="bahan_baku_telur"/><field name="jumlah_bahan">2</field><field name="satuan" ref="satuan_buah"/></record>
+        <record id="resep_telur_mentega" model="janari.resep"><field name="menu_id" ref="menu_telur_orak"/><field name="bahan_baku_id" ref="bahan_baku_mentega"/><field name="jumlah_bahan">10</field><field name="satuan" ref="satuan_gram"/></record>
+        <record id="resep_telur_gula" model="janari.resep"><field name="menu_id" ref="menu_telur_orak"/><field name="bahan_baku_id" ref="bahan_baku_gula_pasir"/><field name="jumlah_bahan">5</field><field name="satuan" ref="satuan_gram"/></record>
 
-        <record id="menu_matcha_latte" model="janari.menu">
-            <field name="name">Matcha Latte</field>
-            <field name="harga_menu">28000</field>
-            <field name="status_menu">tersedia</field>
-        </record>
+        <!-- ===================== PESANAN (8) ===================== -->
+        <!-- P1: Active, ordered -->
+        <record id="pesanan_dummy_01" model="janari.pesanan"><field name="name">ORD-TEST-001</field><field name="nomor_meja">A1</field><field name="nama_pemesan">Rina Wulandari</field><field name="no_hp_pemesan">081234567890</field><field name="sumber_pesanan">offline</field><field name="status_pesanan">confirmed</field></record>
+        <record id="dp_01_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_01"/><field name="menu_id" ref="menu_kopi_susu_janari"/><field name="jumlah">2</field><field name="catatan">tidak terlalu manis</field><field name="status_item">ordered</field></record>
+        <record id="dp_01_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_01"/><field name="menu_id" ref="menu_americano"/><field name="jumlah">1</field><field name="status_item">ordered</field></record>
+        <!-- P2: processed -->
+        <record id="pesanan_dummy_02" model="janari.pesanan"><field name="name">ORD-TEST-002</field><field name="nomor_meja">B3</field><field name="nama_pemesan">Budi Santoso</field><field name="no_hp_pemesan">082198765432</field><field name="sumber_pesanan">online</field><field name="status_pesanan">confirmed</field></record>
+        <record id="dp_02_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_02"/><field name="menu_id" ref="menu_americano"/><field name="jumlah">1</field><field name="catatan">es batu dipisah</field><field name="status_item">processed</field></record>
+        <record id="dp_02_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_02"/><field name="menu_id" ref="menu_vanilla_latte"/><field name="jumlah">1</field><field name="status_item">ordered</field></record>
+        <!-- P3: mix -->
+        <record id="pesanan_dummy_03" model="janari.pesanan"><field name="name">ORD-TEST-003</field><field name="nomor_meja">C2</field><field name="nama_pemesan">Dewi Lestari</field><field name="no_hp_pemesan">085312345678</field><field name="sumber_pesanan">offline</field><field name="status_pesanan">confirmed</field></record>
+        <record id="dp_03_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_03"/><field name="menu_id" ref="menu_matcha_latte"/><field name="jumlah">2</field><field name="catatan">gula dipisah</field><field name="status_item">ordered</field></record>
+        <record id="dp_03_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_03"/><field name="menu_id" ref="menu_dark_choco"/><field name="jumlah">1</field><field name="status_item">processed</field></record>
+        <!-- P4: done -->
+        <record id="pesanan_dummy_04" model="janari.pesanan"><field name="name">ORD-TEST-004</field><field name="nomor_meja">D1</field><field name="nama_pemesan">Ahmad Fauzi</field><field name="no_hp_pemesan">087809876543</field><field name="sumber_pesanan">offline</field><field name="status_pesanan">done</field></record>
+        <record id="dp_04_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_04"/><field name="menu_id" ref="menu_oat_latte"/><field name="jumlah">1</field><field name="status_item">done</field></record>
+        <record id="dp_04_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_04"/><field name="menu_id" ref="menu_roti_bakar"/><field name="jumlah">2</field><field name="status_item">done</field></record>
+        <!-- P5: online, mix -->
+        <record id="pesanan_dummy_05" model="janari.pesanan"><field name="name">ORD-TEST-005</field><field name="nomor_meja">Antrean-01</field><field name="nama_pemesan">Siti Rahayu</field><field name="no_hp_pemesan">081398765432</field><field name="sumber_pesanan">online</field><field name="status_pesanan">confirmed</field></record>
+        <record id="dp_05_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_05"/><field name="menu_id" ref="menu_earl_grey_latte"/><field name="jumlah">1</field><field name="status_item">ordered</field></record>
+        <record id="dp_05_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_05"/><field name="menu_id" ref="menu_telur_orak"/><field name="jumlah">1</field><field name="catatan">tidak pedas</field><field name="status_item">ordered</field></record>
+        <!-- P6: done, makanan -->
+        <record id="pesanan_dummy_06" model="janari.pesanan"><field name="name">ORD-TEST-006</field><field name="nomor_meja">E4</field><field name="sumber_pesanan">offline</field><field name="status_pesanan">done</field></record>
+        <record id="dp_06_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_06"/><field name="menu_id" ref="menu_robusta_tubruk"/><field name="jumlah">2</field><field name="status_item">done</field></record>
+        <record id="dp_06_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_06"/><field name="menu_id" ref="menu_roti_bakar"/><field name="jumlah">3</field><field name="status_item">done</field></record>
+        <!-- P7: all done -->
+        <record id="pesanan_dummy_07" model="janari.pesanan"><field name="name">ORD-TEST-007</field><field name="nomor_meja">Antrean-02</field><field name="sumber_pesanan">online</field><field name="status_pesanan">done</field></record>
+        <record id="dp_07_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_07"/><field name="menu_id" ref="menu_kopi_susu_janari"/><field name="jumlah">3</field><field name="status_item">done</field></record>
+        <!-- P8: fresh ordered -->
+        <record id="pesanan_dummy_08" model="janari.pesanan"><field name="name">ORD-TEST-008</field><field name="nomor_meja">F2</field><field name="sumber_pesanan">offline</field><field name="status_pesanan">confirmed</field></record>
+        <record id="dp_08_a" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_08"/><field name="menu_id" ref="menu_vanilla_latte"/><field name="jumlah">2</field><field name="status_item">ordered</field></record>
+        <record id="dp_08_b" model="janari.detail.pesanan"><field name="pesanan_id" ref="pesanan_dummy_08"/><field name="menu_id" ref="menu_matcha_latte"/><field name="jumlah">1</field><field name="catatan">susu oat jika ada</field><field name="status_item">ordered</field></record>
 
-        <!-- ===================== RESEP / BOM ===================== -->
-        <record id="resep_kopsus_kopi" model="janari.resep">
-            <field name="menu_id" ref="menu_kopi_susu_janari"/>
-            <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
-            <field name="jumlah_bahan">18</field>
-            <field name="satuan" ref="satuan_gram"/>
-        </record>
-
-        <record id="resep_kopsus_susu" model="janari.resep">
-            <field name="menu_id" ref="menu_kopi_susu_janari"/>
-            <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
-            <field name="jumlah_bahan">150</field>
-            <field name="satuan" ref="satuan_ml"/>
-        </record>
-
-        <record id="resep_kopsus_gula" model="janari.resep">
-            <field name="menu_id" ref="menu_kopi_susu_janari"/>
-            <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
-            <field name="jumlah_bahan">20</field>
-            <field name="satuan" ref="satuan_gram"/>
-        </record>
-
-        <record id="resep_americano_kopi" model="janari.resep">
-            <field name="menu_id" ref="menu_americano"/>
-            <field name="bahan_baku_id" ref="bahan_baku_kopi_arabica"/>
-            <field name="jumlah_bahan">20</field>
-            <field name="satuan" ref="satuan_gram"/>
-        </record>
-
-        <record id="resep_matcha_susu" model="janari.resep">
-            <field name="menu_id" ref="menu_matcha_latte"/>
-            <field name="bahan_baku_id" ref="bahan_baku_susu_uht"/>
-            <field name="jumlah_bahan">200</field>
-            <field name="satuan" ref="satuan_ml"/>
-        </record>
-
-        <record id="resep_matcha_gula" model="janari.resep">
-            <field name="menu_id" ref="menu_matcha_latte"/>
-            <field name="bahan_baku_id" ref="bahan_baku_gula_aren"/>
-            <field name="jumlah_bahan">15</field>
-            <field name="satuan" ref="satuan_gram"/>
-        </record>
-
-        <!-- ===================== PESANAN (3) ===================== -->
-
-        <!-- Pesanan 1 — status ordered (tampil merah di KDS) -->
-        <record id="pesanan_dummy_01" model="janari.pesanan">
-            <field name="name">ORD-TEST-001</field>
-            <field name="nomor_meja">A1</field>
-            <field name="sumber_pesanan">offline</field>
-            <field name="status_pesanan">confirmed</field>
-        </record>
-
-        <record id="detail_pesanan_dummy_01_a" model="janari.detail.pesanan">
-            <field name="pesanan_id" ref="pesanan_dummy_01"/>
-            <field name="menu_id" ref="menu_kopi_susu_janari"/>
-            <field name="jumlah">2</field>
-            <field name="catatan">tidak terlalu manis</field>
-            <field name="status_item">ordered</field>
-        </record>
-
-        <record id="detail_pesanan_dummy_01_b" model="janari.detail.pesanan">
-            <field name="pesanan_id" ref="pesanan_dummy_01"/>
-            <field name="menu_id" ref="menu_americano"/>
-            <field name="jumlah">1</field>
-            <field name="status_item">ordered</field>
-        </record>
-
-        <!-- Pesanan 2 — status processed (tampil kuning di KDS) -->
-        <record id="pesanan_dummy_02" model="janari.pesanan">
-            <field name="name">ORD-TEST-002</field>
-            <field name="nomor_meja">B3</field>
-            <field name="sumber_pesanan">online</field>
-            <field name="status_pesanan">confirmed</field>
-        </record>
-
-        <record id="detail_pesanan_dummy_02_a" model="janari.detail.pesanan">
-            <field name="pesanan_id" ref="pesanan_dummy_02"/>
-            <field name="menu_id" ref="menu_americano"/>
-            <field name="jumlah">1</field>
-            <field name="catatan">es batu dipisah</field>
-            <field name="status_item">processed</field>
-        </record>
-
-        <!-- Pesanan 3 — mix ordered dan processed (tampil di KDS) -->
-        <record id="pesanan_dummy_03" model="janari.pesanan">
-            <field name="name">ORD-TEST-003</field>
-            <field name="nomor_meja">C2</field>
-            <field name="sumber_pesanan">offline</field>
-            <field name="status_pesanan">confirmed</field>
-        </record>
-
-        <record id="detail_pesanan_dummy_03_a" model="janari.detail.pesanan">
-            <field name="pesanan_id" ref="pesanan_dummy_03"/>
-            <field name="menu_id" ref="menu_matcha_latte"/>
-            <field name="jumlah">2</field>
-            <field name="catatan">gula dipisah</field>
-            <field name="status_item">ordered</field>
-        </record>
-
-        <record id="detail_pesanan_dummy_03_b" model="janari.detail.pesanan">
-            <field name="pesanan_id" ref="pesanan_dummy_03"/>
-            <field name="menu_id" ref="menu_kopi_susu_janari"/>
-            <field name="jumlah">1</field>
-            <field name="status_item">processed</field>
-        </record>
+        <!-- ===================== TRANSAKSI ===================== -->
+        <record id="trx_dummy_04" model="janari.transaksi"><field name="pesanan_id" ref="pesanan_dummy_04"/><field name="metode_pembayaran">qris</field><field name="total_bayar">48000</field><field name="waktu_transaksi">2026-05-15 09:30:00</field></record>
+        <record id="trx_dummy_06" model="janari.transaksi"><field name="pesanan_id" ref="pesanan_dummy_06"/><field name="metode_pembayaran">cash</field><field name="total_bayar">84000</field><field name="waktu_transaksi">2026-05-15 10:15:00</field></record>
+        <record id="trx_dummy_07" model="janari.transaksi"><field name="pesanan_id" ref="pesanan_dummy_07"/><field name="metode_pembayaran">qris</field><field name="total_bayar">75000</field><field name="waktu_transaksi">2026-05-15 11:00:00</field></record>
 
         <!-- ===================== LOG RIWAYAT STATUS ===================== -->
+        <record id="log_02_a" model="janari.update.status"><field name="detail_pesanan_id" ref="dp_02_a"/><field name="status_before">ordered</field><field name="status_after">processed</field><field name="updated_by" ref="base.user_admin"/><field name="updated_at">2026-05-15 09:15:00</field></record>
+        <record id="log_03_b" model="janari.update.status"><field name="detail_pesanan_id" ref="dp_03_b"/><field name="status_before">ordered</field><field name="status_after">processed</field><field name="updated_by" ref="base.user_admin"/><field name="updated_at">2026-05-15 09:30:00</field></record>
+        <record id="log_04_a" model="janari.update.status"><field name="detail_pesanan_id" ref="dp_04_a"/><field name="status_before">ordered</field><field name="status_after">processed</field><field name="updated_by" ref="base.user_admin"/><field name="updated_at">2026-05-15 09:10:00</field></record>
+        <record id="log_04_a2" model="janari.update.status"><field name="detail_pesanan_id" ref="dp_04_a"/><field name="status_before">processed</field><field name="status_after">done</field><field name="updated_by" ref="base.user_admin"/><field name="updated_at">2026-05-15 09:25:00</field></record>
+        <record id="log_07_a" model="janari.update.status"><field name="detail_pesanan_id" ref="dp_07_a"/><field name="status_before">ordered</field><field name="status_after">processed</field><field name="updated_by" ref="base.user_admin"/><field name="updated_at">2026-05-15 10:45:00</field></record>
+        <record id="log_07_a2" model="janari.update.status"><field name="detail_pesanan_id" ref="dp_07_a"/><field name="status_before">processed</field><field name="status_after">done</field><field name="updated_by" ref="base.user_admin"/><field name="updated_at">2026-05-15 11:00:00</field></record>
 
-        <!-- ORD-002 item 1: ordered → processed -->
-        <record id="log_dummy_02_a_processed" model="janari.update.status">
-            <field name="detail_pesanan_id" ref="detail_pesanan_dummy_02_a"/>
-            <field name="status_before">ordered</field>
-            <field name="status_after">processed</field>
-            <field name="updated_by" ref="base.user_admin"/>
-            <field name="updated_at">2026-05-14 09:15:00</field>
-            <field name="note">Mulai diproses</field>
-        </record>
-
-        <!-- ORD-003 item B: ordered → processed -->
-        <record id="log_dummy_03_b_processed" model="janari.update.status">
-            <field name="detail_pesanan_id" ref="detail_pesanan_dummy_03_b"/>
-            <field name="status_before">ordered</field>
-            <field name="status_after">processed</field>
-            <field name="updated_by" ref="base.user_admin"/>
-            <field name="updated_at">2026-05-14 09:30:00</field>
-        </record>
-
-        <!-- User Dummy -->
+        <!-- ===================== USERS (5) ===================== -->
         <record id="user_kasir_dummy" model="res.users">
-            <field name="name">Andi Kasir</field>
-            <field name="login">kasir</field>
-            <field name="password">kasir123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_kasir')])]"/>
+            <field name="name">Andi Kasir</field><field name="login">kasir</field><field name="password">kasir123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_kasir')])]"/>
         </record>
-
+        <record id="user_packer_dummy" model="res.users">
+            <field name="name">Budi Packer</field><field name="login">packer</field><field name="password">packer123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_packer')])]"/>
+        </record>
         <record id="user_dapur_dummy" model="res.users">
-            <field name="name">Doni Dapur</field>
-            <field name="login">dapur</field>
-            <field name="password">dapur123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_dapur')])]"/>
+            <field name="name">Doni Dapur</field><field name="login">dapur</field><field name="password">dapur123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_dapur')])]"/>
         </record>
-
+        <record id="user_kepala_dummy" model="res.users">
+            <field name="name">Sari Kepala Staf</field><field name="login">kepala</field><field name="password">kepala123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_kepala_staf')])]"/>
+        </record>
         <record id="user_pemilik_dummy" model="res.users">
-            <field name="name">Bapak Pemilik</field>
-            <field name="login">pemilik</field>
-            <field name="password">pemilik123</field>
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_user'), ref('janari_sistem.group_janari_pemilik')])]"/>
+            <field name="name">Bapak Pemilik</field><field name="login">pemilik</field><field name="password">pemilik123</field>
+            <field name="groups_id" eval="[(6, 0, [ref('janari_sistem.group_janari_pemilik')])]"/>
         </record>
     </data>
 </odoo>
+
+

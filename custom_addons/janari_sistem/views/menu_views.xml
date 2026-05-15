@@ -47,5 +47,5 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_janari_master_menu" name="Daftar Menu" parent="menu_janari_inventory" action="action_janari_menu" sequence="20" groups="janari_sistem.group_janari_kasir"/>
+    <menuitem id="menu_janari_master_menu" name="Daftar Menu" parent="menu_janari_inventory" action="action_janari_menu" sequence="20" groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
 </odoo>

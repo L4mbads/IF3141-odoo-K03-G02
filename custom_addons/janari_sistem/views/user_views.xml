@@ -39,11 +39,10 @@
         <field name="act_window_id" ref="action_janari_user_management"/>
     </record>
 
-    <!-- <menuitem id="menu_janari_admin_root" name="Administrasi" parent="menu_janari_root" sequence="50" groups="janari_sistem.group_janari_pemilik"/> -->
     <menuitem id="menu_janari_admin_root"
           name="Administrasi"
           parent="menu_janari_root"
           sequence="50"
-          groups="group_janari_pemilik,base.group_system"/>
-    <menuitem id="menu_janari_user_management" name="Akun Pengguna" parent="menu_janari_admin_root" action="action_janari_user_management" sequence="10" groups="janari_sistem.group_janari_pemilik,janari_sistem.group_janari_kepala_staf"/>
+          groups="janari_sistem.group_janari_pemilik"/>
+    <menuitem id="menu_janari_user_management" name="Akun Pengguna" parent="menu_janari_admin_root" action="action_janari_user_management" sequence="10" groups="janari_sistem.group_janari_pemilik"/>
 </odoo>

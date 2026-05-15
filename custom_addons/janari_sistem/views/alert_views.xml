@@ -1,26 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ===================== SEARCH VIEW ===================== -->
+    <record id="view_janari_alert_search" model="ir.ui.view">
+        <field name="name">janari.bahan.baku.alert.search</field>
+        <field name="model">janari.bahan.baku</field>
+        <field name="arch" type="xml">
+            <search string="Cari Peringatan Stok">
+                <field name="name" string="Nama Bahan"/>
+                <field name="vendor" string="Vendor"/>
+                <filter name="filter_stok_rendah" string="Stok Di Bawah Minimum"
+                        domain="[('is_low_stock', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ===================== LIST VIEW ===================== -->
     <record id="view_janari_alert_tree" model="ir.ui.view">
         <field name="name">janari.bahan.baku.alert.tree</field>
         <field name="model">janari.bahan.baku</field>
         <field name="arch" type="xml">
-            <tree string="Peringatan Stok" decoration-danger="is_low_stock == True" create="false" edit="false">
+            <tree string="Peringatan Stok"
+                  decoration-danger="is_low_stock == True"
+                  create="false">
                 <field name="name"/>
                 <field name="vendor"/>
-                <field name="stok_saat_ini"/>
-                <field name="reorder_point"/>
+                <field name="stok_saat_ini" string="Stok Saat Ini"/>
+                <field name="satuan"/>
+                <field name="reorder_point" string="Batas Minimum"/>
                 <field name="is_low_stock" invisible="1"/>
             </tree>
         </field>
     </record>
 
+    <!-- ===================== ACTION ===================== -->
     <record id="action_janari_alert_stok" model="ir.actions.act_window">
         <field name="name">Peringatan Stok Rendah</field>
         <field name="res_model">janari.bahan.baku</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('is_low_stock', '=', True)]</field>
         <field name="view_id" ref="view_janari_alert_tree"/>
+        <field name="search_view_id" ref="view_janari_alert_search"/>
     </record>
 
-    <menuitem id="menu_janari_alert" name="Peringatan Stok" parent="menu_janari_inventory" action="action_janari_alert_stok" sequence="40" groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
+    <!-- ===================== MENU ===================== -->
+    <menuitem id="menu_janari_alert"
+              name="Peringatan Stok"
+              parent="menu_janari_inventory"
+              action="action_janari_alert_stok"
+              sequence="40"
+              groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
 </odoo>
