@@ -7,11 +7,9 @@
         <field name="arch" type="xml">
             <search string="Cari Peringatan Stok">
                 <field name="name" string="Nama Bahan"/>
-                <separator/>
-                <filter name="filter_belum_ditangani" string="Belum Ditangani"
-                        domain="[('is_alert_handled', '=', False), ('is_low_stock', '=', True)]"/>
-                <filter name="filter_sudah_ditangani" string="Sudah Ditangani"
-                        domain="[('is_alert_handled', '=', True)]"/>
+                <field name="vendor" string="Vendor"/>
+                <filter name="filter_stok_rendah" string="Stok Di Bawah Minimum"
+                        domain="[('is_low_stock', '=', True)]"/>
             </search>
         </field>
     </record>
@@ -22,26 +20,14 @@
         <field name="model">janari.bahan.baku</field>
         <field name="arch" type="xml">
             <tree string="Peringatan Stok"
-                  decoration-danger="is_low_stock == True and is_alert_handled == False"
-                  decoration-muted="is_alert_handled == True"
+                  decoration-danger="is_low_stock == True"
                   create="false">
                 <field name="name"/>
                 <field name="vendor"/>
-                <field name="stok_saat_ini"/>
+                <field name="stok_saat_ini" string="Stok Saat Ini"/>
                 <field name="satuan"/>
-                <field name="reorder_point"/>
-                <field name="is_alert_handled" string="Status Penanganan"
-                       widget="toggle_button"
-                       options="{'terminology': {'string_true': 'Sudah Ditangani', 'string_false': 'Belum Ditangani', 'hover_true': 'Buka Kembali', 'hover_false': 'Tandai Ditangani'}}"/>
+                <field name="reorder_point" string="Batas Minimum"/>
                 <field name="is_low_stock" invisible="1"/>
-                <button name="action_tandai_ditangani" string="Tandai Ditangani"
-                        type="object" icon="fa-check"
-                        class="btn-success btn-sm"
-                        invisible="is_alert_handled == True"/>
-                <button name="action_buka_kembali" string="Buka Kembali"
-                        type="object" icon="fa-undo"
-                        class="btn-secondary btn-sm"
-                        invisible="is_alert_handled == False"/>
             </tree>
         </field>
     </record>
@@ -54,7 +40,6 @@
         <field name="domain">[('is_low_stock', '=', True)]</field>
         <field name="view_id" ref="view_janari_alert_tree"/>
         <field name="search_view_id" ref="view_janari_alert_search"/>
-        <field name="context">{'search_default_filter_belum_ditangani': 1}</field>
     </record>
 
     <!-- ===================== MENU ===================== -->
