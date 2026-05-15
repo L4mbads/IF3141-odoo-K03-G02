@@ -1,6 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_satuan_admin,satuan.admin,model_janari_satuan,base.group_system,1,1,1,1
-access_satuan_kepala,satuan.kepala,model_janari_satuan,janari_sistem.group_janari_kepala_staf,1,1,1,1
 access_bahan_baku_admin,bahan.baku.admin,model_janari_bahan_baku,base.group_system,1,1,1,1
 access_resep_admin,resep.admin,model_janari_resep,base.group_system,1,1,1,1
 access_menu_admin,menu.admin,model_janari_menu,base.group_system,1,1,1,1
@@ -9,11 +8,22 @@ access_detail_pesanan_admin,detail.pesanan.admin,model_janari_detail_pesanan,bas
 access_transaksi_admin,transaksi.admin,model_janari_transaksi,base.group_system,1,1,1,1
 access_update_status_admin,update.status.admin,model_janari_update_status,base.group_system,1,1,1,1
 
+access_satuan_kepala,satuan.kepala,model_janari_satuan,janari_sistem.group_janari_kepala_staf,1,1,1,1
 access_bahan_baku_kepala,bahan.baku.kepala,model_janari_bahan_baku,janari_sistem.group_janari_kepala_staf,1,1,1,1
-access_pesanan_kasir,pesanan.kasir,model_janari_pesanan,janari_sistem.group_janari_kasir,1,1,1,0
-access_detail_pesanan_kasir,detail.pesanan.kasir,model_janari_detail_pesanan,janari_sistem.group_janari_kasir,1,1,1,0
+access_menu_kepala,menu.kepala,model_janari_menu,janari_sistem.group_janari_kepala_staf,1,1,1,1
+access_resep_kepala,resep.kepala,model_janari_resep,janari_sistem.group_janari_kepala_staf,1,1,1,1
+access_pesanan_kepala,pesanan.kepala,model_janari_pesanan,janari_sistem.group_janari_kepala_staf,1,0,0,0
+access_detail_pesanan_kepala,detail.pesanan.kepala,model_janari_detail_pesanan,janari_sistem.group_janari_kepala_staf,1,0,0,0
+access_transaksi_kepala,transaksi.kepala,model_janari_transaksi,janari_sistem.group_janari_kepala_staf,1,0,0,0
+access_update_status_kepala,update.status.kepala,model_janari_update_status,janari_sistem.group_janari_kepala_staf,1,0,0,0
 
+access_pesanan_kasir,pesanan.kasir,model_janari_pesanan,janari_sistem.group_janari_kasir,1,1,1,1
+access_detail_pesanan_kasir,detail.pesanan.kasir,model_janari_detail_pesanan,janari_sistem.group_janari_kasir,1,1,1,1
 access_menu_kasir,menu.kasir,model_janari_menu,janari_sistem.group_janari_kasir,1,0,0,0
+access_resep_kasir,resep.kasir,model_janari_resep,janari_sistem.group_janari_kasir,1,0,0,0
+access_bahan_baku_kasir,bahan.baku.kasir,model_janari_bahan_baku,janari_sistem.group_janari_kasir,1,1,0,0
+access_satuan_kasir,satuan.kasir,model_janari_satuan,janari_sistem.group_janari_kasir,1,0,0,0
+access_transaksi_kasir,transaksi.kasir,model_janari_transaksi,janari_sistem.group_janari_kasir,1,1,1,0
 
 access_detail_pesanan_packer,detail.pesanan.packer,model_janari_detail_pesanan,janari_sistem.group_janari_packer,1,1,0,0
 access_update_status_packer,update.status.packer,model_janari_update_status,janari_sistem.group_janari_packer,1,1,1,0
@@ -26,6 +36,10 @@ access_menu_dapur,menu.dapur,model_janari_menu,janari_sistem.group_janari_dapur,
 access_update_status_dapur,update.status.dapur,model_janari_update_status,janari_sistem.group_janari_dapur,1,0,0,0
 
 access_bahan_baku_pemilik,bahan.baku.pemilik,model_janari_bahan_baku,janari_sistem.group_janari_pemilik,1,1,1,1
+access_menu_pemilik,menu.pemilik,model_janari_menu,janari_sistem.group_janari_pemilik,1,1,1,1
 access_resep_pemilik,resep.pemilik,model_janari_resep,janari_sistem.group_janari_pemilik,1,1,1,1
-access_laporan_pemilik,laporan.pemilik,model_janari_transaksi,janari_sistem.group_janari_pemilik,1,0,0,0
-access_update_status_staf,update.status.staf,model_janari_update_status,janari_sistem.group_janari_dapur,1,1,1,0
+access_satuan_pemilik,satuan.pemilik,model_janari_satuan,janari_sistem.group_janari_pemilik,1,1,1,1
+access_pesanan_pemilik,pesanan.pemilik,model_janari_pesanan,janari_sistem.group_janari_pemilik,1,1,1,0
+access_transaksi_pemilik,transaksi.pemilik,model_janari_transaksi,janari_sistem.group_janari_pemilik,1,1,1,1
+access_detail_pesanan_pemilik,detail.pesanan.pemilik,model_janari_detail_pesanan,janari_sistem.group_janari_pemilik,1,1,0,0
+access_update_status_pemilik,update.status.pemilik,model_janari_update_status,janari_sistem.group_janari_pemilik,1,0,0,0
