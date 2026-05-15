@@ -31,10 +31,10 @@ access_update_status_packer,update.status.packer,model_janari_update_status,jana
 access_pesanan_packer,pesanan.packer,model_janari_pesanan,janari_sistem.group_janari_packer,1,1,0,0
 access_menu_packer,menu.packer,model_janari_menu,janari_sistem.group_janari_packer,1,0,0,0
 
-access_detail_pesanan_dapur,detail.pesanan.dapur,model_janari_detail_pesanan,janari_sistem.group_janari_dapur,1,0,0,0
+access_detail_pesanan_dapur,detail.pesanan.dapur,model_janari_detail_pesanan,janari_sistem.group_janari_dapur,1,1,0,0
 access_pesanan_dapur,pesanan.dapur,model_janari_pesanan,janari_sistem.group_janari_dapur,1,0,0,0
 access_menu_dapur,menu.dapur,model_janari_menu,janari_sistem.group_janari_dapur,1,0,0,0
-access_update_status_dapur,update.status.dapur,model_janari_update_status,janari_sistem.group_janari_dapur,1,0,0,0
+access_update_status_dapur,update.status.dapur,model_janari_update_status,janari_sistem.group_janari_dapur,1,1,1,0
 
 access_bahan_baku_pemilik,bahan.baku.pemilik,model_janari_bahan_baku,janari_sistem.group_janari_pemilik,1,1,1,1
 access_menu_pemilik,menu.pemilik,model_janari_menu,janari_sistem.group_janari_pemilik,1,1,1,1
