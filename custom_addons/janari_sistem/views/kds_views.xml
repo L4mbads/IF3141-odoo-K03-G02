@@ -27,7 +27,7 @@
         <field name="name">janari.detail.pesanan.kanban</field>
         <field name="model">janari.detail.pesanan</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="status_item" quick_create="false">
+            <kanban default_group_by="status_item" quick_create="false" group_expand="1">
                 <field name="menu_id"/>
                 <field name="jumlah"/>
                 <field name="status_item"/>
@@ -86,11 +86,11 @@
                 <header>
                     <button name="action_mulai_proses" string="Mulai Proses" type="object"
                             class="btn-warning"
-                            groups="janari_sistem.group_janari_packer"
+                            groups="janari_sistem.group_janari_packer,janari_sistem.group_janari_dapur"
                             invisible="status_item != 'ordered'"/>
                     <button name="action_selesaikan" string="Selesaikan" type="object"
                             class="btn-success"
-                            groups="janari_sistem.group_janari_packer"
+                            groups="janari_sistem.group_janari_packer,janari_sistem.group_janari_dapur"
                             invisible="status_item != 'processed'"/>
                     <field name="status_item" widget="statusbar" statusbar_visible="ordered,processed,done"/>
                 </header>
@@ -154,9 +154,9 @@
         <field name="name">Kitchen Display System</field>
         <field name="res_model">janari.detail.pesanan</field>
         <field name="view_mode">kanban,form</field>
-        <field name="domain">[('status_item', '!=', 'done')]</field>
+        <field name="domain">[]</field>
         <field name="search_view_id" ref="view_janari_kds_search"/>
-        <field name="context">{'search_default_filter_aktif': 1}</field>
+        <field name="context">{'search_default_filter_aktif': 1, 'search_default_filter_hari_ini': 1}</field>
     </record>
 
     <!-- Action for UpdateStatus Log -->
