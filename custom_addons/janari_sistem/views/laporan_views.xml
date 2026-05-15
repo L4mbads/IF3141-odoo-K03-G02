@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ===================== LAPORAN PENDAPATAN HARIAN ===================== -->
     <record id="view_janari_pesanan_pivot" model="ir.ui.view">
         <field name="name">janari.pesanan.pivot</field>
         <field name="model">janari.pesanan</field>
         <field name="arch" type="xml">
-            <pivot string="Laporan Harian" sample="1">
+            <pivot string="Laporan Pendapatan Harian" sample="1">
                 <field name="tanggal_pesanan" type="row" interval="day"/>
                 <field name="status_pesanan" type="col"/>
                 <field name="total_harga" type="measure"/>
@@ -29,11 +30,85 @@
         <field name="view_mode">pivot,graph,tree</field>
     </record>
 
-    <!-- <menuitem id="menu_janari_laporan_root" name="Laporan" parent="menu_janari_root" sequence="40" groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/> -->
+    <!-- ===================== LAPORAN MENU TERLARIS ===================== -->
+    <record id="view_janari_menu_terlaris_pivot" model="ir.ui.view">
+        <field name="name">janari.detail.pesanan.menu.terlaris.pivot</field>
+        <field name="model">janari.detail.pesanan</field>
+        <field name="arch" type="xml">
+            <pivot string="Menu Terlaris" sample="1">
+                <field name="menu_id" type="row"/>
+                <field name="jumlah" type="measure"/>
+                <field name="subtotal" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_janari_menu_terlaris_graph" model="ir.ui.view">
+        <field name="name">janari.detail.pesanan.menu.terlaris.graph</field>
+        <field name="model">janari.detail.pesanan</field>
+        <field name="arch" type="xml">
+            <graph string="Menu Terlaris" type="bar">
+                <field name="menu_id" type="row"/>
+                <field name="jumlah" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_janari_menu_terlaris" model="ir.actions.act_window">
+        <field name="name">Menu Terlaris</field>
+        <field name="res_model">janari.detail.pesanan</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="domain">[('pesanan_id.status_pesanan', '!=', 'draft')]</field>
+    </record>
+
+    <!-- ===================== LAPORAN SISA STOK BAHAN BAKU ===================== -->
+    <record id="view_janari_stok_akhir_tree" model="ir.ui.view">
+        <field name="name">janari.bahan.baku.stok.tree</field>
+        <field name="model">janari.bahan.baku</field>
+        <field name="arch" type="xml">
+            <tree string="Sisa Stok Bahan Baku"
+                  decoration-danger="is_low_stock == True"
+                  create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="jenis"/>
+                <field name="stok_saat_ini" string="Stok Saat Ini"/>
+                <field name="satuan"/>
+                <field name="reorder_point" string="Minimum (Reorder)"/>
+                <field name="is_low_stock" string="Stok Rendah?" widget="boolean"/>
+                <field name="vendor"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_janari_stok_akhir" model="ir.actions.act_window">
+        <field name="name">Sisa Stok Bahan Baku</field>
+        <field name="res_model">janari.bahan.baku</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_janari_stok_akhir_tree"/>
+    </record>
+
+    <!-- ===================== MENU ITEMS ===================== -->
     <menuitem id="menu_janari_laporan_root"
           name="Laporan"
           parent="menu_janari_root"
           sequence="40"
-          groups="group_janari_kepala_staf,group_janari_pemilik,base.group_system"/>
-    <menuitem id="menu_janari_laporan_harian" name="Rekapitulasi Harian" parent="menu_janari_laporan_root" action="action_janari_laporan" sequence="10" groups="janari_sistem.group_janari_pemilik"/>
-</odoo>
+          groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
+    <menuitem id="menu_janari_laporan_harian"
+              name="Rekapitulasi Harian"
+              parent="menu_janari_laporan_root"
+              action="action_janari_laporan"
+              sequence="10"
+              groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
+    <menuitem id="menu_janari_menu_terlaris"
+              name="Menu Terlaris"
+              parent="menu_janari_laporan_root"
+              action="action_janari_menu_terlaris"
+              sequence="20"
+              groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
+    <menuitem id="menu_janari_stok_akhir"
+              name="Sisa Stok Bahan Baku"
+              parent="menu_janari_laporan_root"
+              action="action_janari_stok_akhir"
+              sequence="30"
+              groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
+</odoo>

@@ -13,6 +13,7 @@
         'views/bahan_baku_views.xml',
         'views/menu_views.xml',
         'views/pesanan_views.xml',
+        'views/transaksi_views.xml',
         'views/kds_views.xml',
         'views/alert_views.xml',
         'views/laporan_views.xml',
