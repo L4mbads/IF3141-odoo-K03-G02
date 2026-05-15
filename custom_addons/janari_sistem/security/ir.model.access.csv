@@ -44,3 +44,4 @@ access_pesanan_pemilik,pesanan.pemilik,model_janari_pesanan,janari_sistem.group_
 access_transaksi_pemilik,transaksi.pemilik,model_janari_transaksi,janari_sistem.group_janari_pemilik,1,1,1,1
 access_detail_pesanan_pemilik,detail.pesanan.pemilik,model_janari_detail_pesanan,janari_sistem.group_janari_pemilik,1,1,0,0
 access_update_status_pemilik,update.status.pemilik,model_janari_update_status,janari_sistem.group_janari_pemilik,1,0,0,0
+access_res_users_pemilik,res.users.pemilik,base.model_res_users,group_janari_pemilik,1,1,1,1
