@@ -2,7 +2,7 @@
     'name': 'Sistem Informasi Janari',
     'version': '1.0',
     'summary': 'Manajemen Inventaris, KDS, dan POS untuk Kedai Janari',
-    'description': 'Modul custom untuk Milestone 4 IF3141 Sistem Informasi ITB.',
+    'description': 'Modul custom sebagai implementasi solusi terpilih untuk Janari, dibuat untuk pemenuhan tugas IF3141 Sistem Informasi ITB.',
     'author': 'Kelompok 02 - K03',
     'category': 'Operations',
     'depends': ['base', 'mail', 'bus'],

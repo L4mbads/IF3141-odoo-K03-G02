@@ -7,8 +7,10 @@
         <field name="arch" type="xml">
             <pivot string="Laporan Pendapatan Harian" sample="1">
                 <field name="tanggal_pesanan" type="row" interval="day"/>
-                <field name="status_pesanan" type="col"/>
+                <field name="status_pesanan" type="row"/>
+
                 <field name="total_harga" type="measure"/>
+                <field name="transaction_count" type="measure"/>
             </pivot>
         </field>
     </record>
@@ -17,8 +19,8 @@
         <field name="name">janari.pesanan.graph</field>
         <field name="model">janari.pesanan</field>
         <field name="arch" type="xml">
-            <graph string="Grafik Pendapatan Harian" type="bar">
-                <field name="tanggal_pesanan" type="row" interval="day"/>
+            <graph string="Analisis Penjualan" type="bar" stacked="True">
+                <field name="tanggal_pesanan" interval="day"/>
                 <field name="total_harga" type="measure"/>
             </graph>
         </field>
@@ -111,4 +113,4 @@
               action="action_janari_stok_akhir"
               sequence="30"
               groups="janari_sistem.group_janari_kepala_staf,janari_sistem.group_janari_pemilik"/>
-</odoo>
+</odoo>

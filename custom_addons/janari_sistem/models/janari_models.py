@@ -393,7 +393,7 @@ class DetailPesanan(models.Model):
                         'detail_pesanan_id': record.id,
                         'status_before': record.status_item,
                         'status_after': vals['status_item'],
-                        'updated_by': self.env.user.id,
+                        'updated_by': self.env.user.sudo().id,
                         'updated_at': fields.Datetime.now(),
                     })
             result = super().write(vals)
@@ -450,7 +450,7 @@ class UpdateStatus(models.Model):
     detail_pesanan_id = fields.Many2one('janari.detail.pesanan', string='Item Pesanan', required=True, ondelete='cascade')
     status_before = fields.Char(string='Status Sebelum')
     status_after = fields.Char(string='Status Sesudah')
-    updated_by = fields.Many2one('res.users', string='Diubah Oleh', default=lambda self: self.env.user)
+    updated_by = fields.Many2one('res.users', string='Diubah Oleh', default=lambda self: self.env.user.sudo())
     updated_at = fields.Datetime(string='Waktu Perubahan', default=fields.Datetime.now)
     note = fields.Char(string='Catatan')
 
