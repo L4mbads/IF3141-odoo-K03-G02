@@ -10,7 +10,6 @@
                 <field name="status_pesanan" type="row"/>
 
                 <field name="total_harga" type="measure"/>
-                <field name="transaction_count" type="measure"/>
             </pivot>
         </field>
     </record>
