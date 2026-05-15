@@ -38,11 +38,6 @@ class BahanBaku(models.Model):
         compute="_compute_low_stock",
         store=True,
     )
-    is_alert_handled = fields.Boolean(
-        string="Peringatan Ditangani",
-        default=False,
-        help="Tandai jika peringatan stok rendah ini sudah ditindaklanjuti (pemesanan ke supplier sudah dilakukan).",
-    )
 
     def action_new_bahan_baku(self):
         return {
@@ -52,23 +47,10 @@ class BahanBaku(models.Model):
             'target': 'current',
         }
 
-    def action_tandai_ditangani(self):
-        """Tandai peringatan stok rendah sebagai sudah ditindaklanjuti."""
-        for record in self:
-            record.is_alert_handled = True
-
-    def action_buka_kembali(self):
-        """Reset status penanganan agar peringatan aktif kembali."""
-        for record in self:
-            record.is_alert_handled = False
-
-    @api.depends('stok_saat_ini', 'reorder_point', 'is_alert_handled')
+    @api.depends('stok_saat_ini', 'reorder_point')
     def _compute_low_stock(self):
         for record in self:
-            record.is_low_stock = (
-                record.stok_saat_ini <= record.reorder_point
-                and not record.is_alert_handled
-            )
+            record.is_low_stock = record.stok_saat_ini <= record.reorder_point
 
 # D-04 Tabel Menu
 class Menu(models.Model):
@@ -119,6 +101,11 @@ class Pesanan(models.Model):
         ('offline', 'Offline'),
         ('online', 'Online')
     ], string='Sumber Pesanan', default='offline')
+    metode_pembayaran = fields.Selection([
+        ('cash', 'Tunai'),
+        ('qris', 'QRIS'),
+        ('transfer', 'Transfer Bank'),
+    ], string='Metode Pembayaran', default='cash')
     status_pesanan = fields.Selection([
         ('draft', 'Menunggu Pembayaran'),
         ('confirmed', 'Terkonfirmasi'),
@@ -288,7 +275,14 @@ class Pesanan(models.Model):
                             resep.bahan_baku_id.name,
                         )
                         resep.bahan_baku_id.stok_saat_ini -= kebutuhan_stok
-                record.status_pesanan = 'confirmed'
+                record.with_context(tracking_disable=True).write({'status_pesanan': 'confirmed'})
+                # Buat record transaksi dengan metode pembayaran yang dipilih
+                self.env['janari.transaksi'].create({
+                    'pesanan_id': record.id,
+                    'metode_pembayaran': record.metode_pembayaran or 'cash',
+                    'total_bayar': record.total_harga,
+                    'waktu_transaksi': fields.Datetime.now(),
+                })
 
                 low_stock_bahan = record.detail_pesanan_ids.mapped('menu_id.resep_ids.bahan_baku_id').filtered(
                     lambda b: b.stok_saat_ini <= b.reorder_point
@@ -355,7 +349,8 @@ class DetailPesanan(models.Model):
         ('ordered', 'Ordered'),
         ('processed', 'Processed'),
         ('done', 'Done')
-    ], string='Status Dapur (KDS)', default='ordered')
+    ], string='Status Dapur (KDS)', default='ordered',
+       group_expand='_group_expand_status_item')
     processed_at = fields.Datetime(string='Waktu Mulai Proses', readonly=True)
     done_at = fields.Datetime(string='Waktu Selesai', readonly=True)
     durasi_tunggu = fields.Integer(
@@ -368,6 +363,11 @@ class DetailPesanan(models.Model):
     # Related fields untuk ditampilkan di KDS kanban card
     nomor_meja = fields.Char(related='pesanan_id.nomor_meja', string='Nomor Meja', store=False, readonly=True)
     tanggal_pesanan = fields.Datetime(related='pesanan_id.tanggal_pesanan', string='Waktu Pesanan', store=False, readonly=True)
+
+    @api.model
+    def _group_expand_status_item(self, states, domain, order):
+        """Pastikan kolom kanban selalu muncul dalam urutan: ordered → processed → done."""
+        return ['ordered', 'processed', 'done']
 
     @api.depends('menu_id', 'jumlah')
     def _compute_subtotal(self):
@@ -386,6 +386,16 @@ class DetailPesanan(models.Model):
 
     def write(self, vals):
         if 'status_item' in vals:
+            # Cek: status dapur hanya bisa diubah jika pesanan sudah dikonfirmasi
+            for record in self:
+                if (vals['status_item'] != record.status_item and
+                        record.pesanan_id.status_pesanan == 'draft'):
+                    raise UserError(
+                        f'Pesanan "{record.pesanan_id.name}" belum dikonfirmasi/dibayar. '
+                        f'Status dapur hanya bisa diubah setelah pembayaran dikonfirmasi.'
+                    )
+            # Kumpulkan pesanan yang terdampak sebelum write
+            affected_pesanan = self.mapped('pesanan_id')
             logs = []
             for record in self:
                 if record.status_item != vals['status_item']:
@@ -399,11 +409,25 @@ class DetailPesanan(models.Model):
             result = super().write(vals)
             for log_vals in logs:
                 self.env['janari.update.status'].create(log_vals)
+            # Auto-selesaikan pesanan jika semua item sudah done
+            if vals['status_item'] == 'done':
+                for pesanan in affected_pesanan:
+                    if (pesanan.status_pesanan == 'confirmed' and
+                            all(item.status_item == 'done'
+                                for item in pesanan.detail_pesanan_ids)):
+                        pesanan.with_context(tracking_disable=True).write(
+                            {'status_pesanan': 'done'}
+                        )
             return result
         return super().write(vals)
 
     def action_mulai_proses(self):
         for record in self:
+            if record.pesanan_id.status_pesanan == 'draft':
+                raise UserError(
+                    f'Pesanan "{record.pesanan_id.name}" belum dikonfirmasi/dibayar. '
+                    f'Status dapur hanya bisa diubah setelah pembayaran dikonfirmasi.'
+                )
             if record.status_item != 'ordered':
                 raise UserError('Hanya item dengan status "Ordered" yang bisa diproses.')
             record.write({
@@ -413,6 +437,11 @@ class DetailPesanan(models.Model):
 
     def action_selesaikan(self):
         for record in self:
+            if record.pesanan_id.status_pesanan == 'draft':
+                raise UserError(
+                    f'Pesanan "{record.pesanan_id.name}" belum dikonfirmasi/dibayar. '
+                    f'Status dapur hanya bisa diubah setelah pembayaran dikonfirmasi.'
+                )
             if record.status_item != 'processed':
                 raise UserError('Hanya item dengan status "Processed" yang bisa diselesaikan.')
             record.write({
@@ -421,11 +450,8 @@ class DetailPesanan(models.Model):
             })
             pesanan = record.pesanan_id
             if all(item.status_item == 'done' for item in pesanan.detail_pesanan_ids):
-                pesanan.status_pesanan = 'done'
-                pesanan.message_post(
-                    body=f'Pesanan <b>{pesanan.name}</b> (Meja {pesanan.nomor_meja or "-"}) sudah selesai dan siap diserahkan ke pelanggan.',
-                    message_type='notification',
-                    subtype_xmlid='mail.mt_comment',
+                pesanan.with_context(tracking_disable=True).write(
+                    {'status_pesanan': 'done'}
                 )
 
 # D-07 Tabel Transaksi
@@ -436,7 +462,8 @@ class Transaksi(models.Model):
     pesanan_id = fields.Many2one('janari.pesanan', string='Pesanan', required=True)
     metode_pembayaran = fields.Selection([
         ('cash', 'Tunai'),
-        ('qris', 'QRIS')
+        ('qris', 'QRIS'),
+        ('transfer', 'Transfer Bank'),
     ], string='Metode Pembayaran', required=True)
     waktu_transaksi = fields.Datetime(string='Waktu Transaksi', default=fields.Datetime.now)
     total_bayar = fields.Float(string='Total Bayar')
